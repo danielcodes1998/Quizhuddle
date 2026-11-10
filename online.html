@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Quiz Huddle Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: same phone-width chat column as the solo game. Rooms are joined with a five-letter code that also travels inside a WhatsApp invite link. */
+  :root {
+    --bg: #EEF2F5;
+    --surface: #FFFFFF;
+    --ink: #10212B;
+    --muted: #55667A;
+    --line: #D3DCE3;
+    --accent: #2457F5;
+    --accent-ink: #FFFFFF;
+    --good: #0F7A57;
+    --good-bg: #DDF3EA;
+    --bad: #B93027;
+    --bad-bg: #FBE3E0;
+    --warn: #B86E00;
+    --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E161B;
+      --surface: #17222A;
+      --ink: #E8EFF3;
+      --muted: #93A4B0;
+      --line: #2A3A45;
+      --accent: #6E93FF;
+      --accent-ink: #0E161B;
+      --good: #4FD1A0;
+      --good-bg: #123226;
+      --bad: #FF8479;
+      --bad-bg: #3A1A18;
+      --warn: #F2B552;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E161B;
+    --surface: #17222A;
+    --ink: #E8EFF3;
+    --muted: #93A4B0;
+    --line: #2A3A45;
+    --accent: #6E93FF;
+    --accent-ink: #0E161B;
+    --good: #4FD1A0;
+    --good-bg: #123226;
+    --bad: #FF8479;
+    --bad-bg: #3A1A18;
+    --warn: #F2B552;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 30rem;
+    margin-inline: auto;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 40px;
+  }
+  section { display: flex; flex-direction: column; gap: 18px; }
+  h1, h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 { font-size: 2.6rem; }
+  h2 { font-size: 2rem; }
+  p { margin: 0; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+  a { color: var(--accent); }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .muted { color: var(--muted); font-size: 0.9rem; }
+  .note { font-weight: 600; min-height: 1.5em; }
+  .note.err { color: var(--bad); }
+
+  .msg { padding: 12px 16px 14px; max-width: 92%; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .msg p { overflow-wrap: anywhere; }
+  .msg-in { background: var(--surface); border: 1px solid var(--line); border-radius: 20px 20px 20px 4px; align-self: flex-start; }
+  .msg-out { background: var(--accent); color: var(--accent-ink); border-radius: 20px 20px 4px 20px; align-self: flex-end; }
+  .who { font-size: 0.75rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); }
+  .q { max-width: 100%; }
+  .q p { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.25; }
+
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  input[type="text"] {
+    width: 100%;
+    min-width: 0;
+    padding: 13px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .joinrow { display: flex; gap: 10px; }
+  .joinrow input { flex: 1; text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600; }
+  .joinrow .primary { flex: none; }
+  .or { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 0.85rem; }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+  .primary, .secondary, .link { cursor: pointer; border-radius: 14px; font-weight: 600; text-align: center; text-decoration: none; }
+  .primary { display: block; border: 0; background: var(--accent); color: var(--accent-ink); padding: 15px 20px; font-size: 1.05rem; }
+  .primary:disabled { opacity: 0.45; cursor: default; }
+  .secondary { display: block; border: 1.5px solid var(--line); background: var(--surface); padding: 13px 20px; }
+  .link { border: 0; background: none; color: var(--muted); padding: 6px 0; text-decoration: underline; border-radius: 6px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .chip span { display: inline-block; padding: 9px 16px; border: 1.5px solid var(--line); border-radius: 999px; background: var(--surface); font-weight: 500; }
+  .chip input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chip input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend { padding: 0; margin-bottom: 10px; }
+
+  /* lobby */
+  .codebox {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px;
+    border: 1.5px dashed var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+  }
+  .code { font-family: var(--font-display); font-weight: 800; font-size: 2.6rem; letter-spacing: 0.25em; line-height: 1.1; }
+  .plist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .plist li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    min-width: 0;
+  }
+  .plist .n { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .tag { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); flex: none; }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+
+  /* play */
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .timer { display: flex; align-items: center; gap: 12px; }
+  .track { flex: 1; height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  #bar { height: 100%; width: 100%; background: var(--accent); border-radius: 999px; }
+  #bar.low { background: var(--warn); }
+  #secs { font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex; align-items: center; gap: 14px; width: 100%; text-align: left;
+    padding: 14px 16px; border: 1.5px solid var(--line); border-radius: 16px;
+    background: var(--surface); cursor: pointer; min-width: 0;
+  }
+  .opt .l { flex: none; width: 2rem; height: 2rem; display: grid; place-items: center; border-radius: 50%; background: var(--bg); font-weight: 600; font-size: 0.9rem; }
+  .opt .t { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); }
+  .opt:disabled { cursor: default; }
+  .opt.pick { border-color: var(--accent); }
+  .opt.good { background: var(--good-bg); border-color: var(--good); }
+  .opt.bad { background: var(--bad-bg); border-color: var(--bad); }
+  .opt.good .l { background: var(--good); color: var(--bg); }
+  .opt.bad .l { background: var(--bad); color: var(--bg); }
+  .opt.dim { opacity: 0.55; }
+  .feedback { font-weight: 600; min-height: 1.5em; }
+  .feedback.good { color: var(--good); }
+  .feedback.bad { color: var(--bad); }
+
+  .board { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .board li {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr auto auto;
+    align-items: baseline;
+    gap: 10px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+    min-width: 0;
+  }
+  .board li.me { border-color: var(--accent); }
+  .board .rk { color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .board .n { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .board .d { font-weight: 600; font-size: 0.9rem; font-variant-numeric: tabular-nums; color: var(--muted); }
+  .board .d.up { color: var(--good); }
+  .board .v { font-family: var(--font-display); font-weight: 800; font-size: 1.2rem; font-variant-numeric: tabular-nums; min-width: 3ch; text-align: right; }
+  .board li.first { background: var(--good-bg); border-color: var(--good); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #bar { transition: width 0.12s linear; }
+    .opt, .primary, .secondary { transition: background-color 0.15s, border-color 0.15s; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+
+  <section id="scr-home">
+    <div>
+      <p class="eyebrow">Online with friends</p>
+      <h1>Quiz Huddle</h1>
+    </div>
+    <div class="msg msg-in">
+      <span class="who">Quizmaster</span>
+      <p>Make a room, send the code to your friends on WhatsApp, and everyone answers the same questions at the same time.</p>
+    </div>
+    <div class="field">
+      <label class="eyebrow" for="name">Your name</label>
+      <input id="name" type="text" maxlength="14" placeholder="e.g. Daniel" autocomplete="off">
+    </div>
+    <button id="create" class="primary" type="button">Create a room</button>
+    <div class="or">or join a friend</div>
+    <div class="joinrow">
+      <input id="joincode" type="text" maxlength="5" placeholder="CODE" autocomplete="off" autocapitalize="characters" aria-label="Room code">
+      <button id="join" class="primary" type="button">Join</button>
+    </div>
+    <p id="homeMsg" class="note" aria-live="polite"></p>
+    <a class="muted" href="index.html">Play solo instead</a>
+  </section>
+
+  <section id="scr-lobby" hidden>
+    <div>
+      <p class="eyebrow">Waiting room</p>
+      <h2>Get everyone in</h2>
+    </div>
+    <div class="codebox">
+      <span class="eyebrow">Room code</span>
+      <span class="code" id="roomCode">-----</span>
+    </div>
+    <div class="actions">
+      <a id="invite" class="secondary" href="#" target="_blank" rel="noopener">Invite on WhatsApp</a>
+    </div>
+    <div>
+      <p class="eyebrow" id="countLabel">Players</p>
+      <ul class="plist" id="plist"></ul>
+    </div>
+    <fieldset id="topicChips">
+      <legend class="eyebrow">Topic</legend>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="tcat" value="mixed" checked><span>Mixed</span></label>
+        <label class="chip"><input type="radio" name="tcat" value="football"><span>Football</span></label>
+        <label class="chip"><input type="radio" name="tcat" value="general"><span>General</span></label>
+        <label class="chip"><input type="radio" name="tcat" value="words"><span>Word play</span></label>
+      </div>
+    </fieldset>
+    <p id="topicText" class="muted"></p>
+    <p id="lobbyHint" class="note"></p>
+    <button id="startBtn" class="primary" type="button" disabled>Start quiz</button>
+    <button id="leaveLobby" class="link" type="button">Leave room</button>
+  </section>
+
+  <section id="scr-play" hidden>
+    <div class="topbar">
+      <span id="qcount" class="eyebrow"></span>
+      <button id="leavePlay" class="link" type="button">Leave game</button>
+    </div>
+    <div class="timer">
+      <div class="track"><div id="bar"></div></div>
+      <span id="secs">15</span>
+    </div>
+    <div class="msg msg-in q">
+      <span class="who" id="catlabel"></span>
+      <p id="qtext"></p>
+    </div>
+    <div class="opts" id="opts" role="group" aria-label="Answers"></div>
+    <p class="feedback" id="fb" aria-live="polite"></p>
+    <ol class="board" id="roundBoard"></ol>
+  </section>
+
+  <section id="scr-end" hidden>
+    <div>
+      <p class="eyebrow">Final whistle</p>
+      <h2 id="endTitle"></h2>
+    </div>
+    <ol class="board" id="finalBoard"></ol>
+    <div class="msg msg-out"><p id="shareText"></p></div>
+    <div class="actions">
+      <a id="wa" class="primary" href="#" target="_blank" rel="noopener">Send to a WhatsApp chat</a>
+      <button id="again" class="secondary" type="button">Back to the waiting room</button>
+      <p id="waitAgain" class="muted" hidden>The host can start another round from the waiting room.</p>
+      <button id="leaveEnd" class="link" type="button">Leave room</button>
+    </div>
+  </section>
+
+</main>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script>
+(function () {
+  var ROUND = 10, SECONDS = 15, MAXP = 6, PREFIX = "quizhuddle-";
+
+  var BANK = {
+    football: [
+      { q: "Which country won the 2022 FIFA World Cup?", c: "Argentina", w: ["France", "Brazil", "Croatia"] },
+      { q: "How many players does each team have on the pitch during a match?", c: "11", w: ["10", "9", "12"] },
+      { q: "Which country won the Africa Cup of Nations played in early 2024?", c: "Ivory Coast", w: ["Nigeria", "Senegal", "Egypt"] },
+      { q: "In which year did the Super Eagles win the Africa Cup of Nations in South Africa?", c: "2013", w: ["2010", "2004", "2019"] },
+      { q: "Which manager is nicknamed \"The Special One\"?", c: "José Mourinho", w: ["Pep Guardiola", "Arsène Wenger", "Jürgen Klopp"] },
+      { q: "Which country hosted the 2010 FIFA World Cup?", c: "South Africa", w: ["Germany", "Brazil", "Nigeria"] },
+      { q: "How long is a standard football match, not counting extra time?", c: "90 minutes", w: ["80 minutes", "100 minutes", "120 minutes"] },
+      { q: "Which player has won the most Ballon d'Or awards?", c: "Lionel Messi", w: ["Cristiano Ronaldo", "Michel Platini", "Johan Cruyff"] },
+      { q: "Which Nigerian striker was named CAF African Footballer of the Year in 2023?", c: "Victor Osimhen", w: ["Ademola Lookman", "Kelechi Iheanacho", "Wilfred Ndidi"] },
+      { q: "What colour card sends a player off the pitch?", c: "Red", w: ["Yellow", "Blue", "Green"] },
+      { q: "Which club plays its home games at Camp Nou?", c: "FC Barcelona", w: ["Real Madrid", "Juventus", "Bayern Munich"] },
+      { q: "Which player scored the famous \"Hand of God\" goal in 1986?", c: "Diego Maradona", w: ["Pelé", "Zinedine Zidane", "Ronaldinho"] }
+    ],
+    general: [
+      { q: "What is the capital city of Nigeria?", c: "Abuja", w: ["Lagos", "Kano", "Port Harcourt"] },
+      { q: "How many states does Nigeria have?", c: "36", w: ["30", "32", "37"] },
+      { q: "Which is the largest ocean on Earth?", c: "Pacific Ocean", w: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean"] },
+      { q: "What is the chemical symbol for gold?", c: "Au", w: ["Ag", "Go", "Gd"] },
+      { q: "Which is the longest river in Africa?", c: "The Nile", w: ["The Niger", "The Congo", "The Zambezi"] },
+      { q: "Which planet is known as the Red Planet?", c: "Mars", w: ["Venus", "Jupiter", "Mercury"] },
+      { q: "In which year did Nigeria gain independence?", c: "1960", w: ["1957", "1963", "1966"] },
+      { q: "Which is the largest country in Africa by land area?", c: "Algeria", w: ["Nigeria", "Democratic Republic of the Congo", "Sudan"] },
+      { q: "How many continents are there on Earth?", c: "7", w: ["5", "6", "8"] },
+      { q: "Who wrote the novel \"Things Fall Apart\"?", c: "Chinua Achebe", w: ["Wole Soyinka", "Chimamanda Ngozi Adichie", "Ben Okri"] },
+      { q: "Which Nigerian writer won the Nobel Prize in Literature in 1986?", c: "Wole Soyinka", w: ["Chinua Achebe", "Buchi Emecheta", "Cyprian Ekwensi"] },
+      { q: "Mount Kilimanjaro, the highest mountain in Africa, is in which country?", c: "Tanzania", w: ["Kenya", "Uganda", "Ethiopia"] }
+    ],
+    words: [
+      { q: "Which of these is the correct spelling?", c: "Definitely", w: ["Definately", "Definitly", "Defanitely"] },
+      { q: "Which of these is the correct spelling?", c: "Accommodation", w: ["Acommodation", "Accomodation", "Accommadation"] },
+      { q: "Which word is an anagram of \"heart\"?", c: "Earth", w: ["Hearth", "Hearty", "Thread"] },
+      { q: "What is the opposite of \"ancient\"?", c: "Modern", w: ["Old", "Historic", "Antique"] },
+      { q: "Which word means \"very happy\"?", c: "Elated", w: ["Gloomy", "Weary", "Frail"] },
+      { q: "Which word means the same as \"huge\"?", c: "Enormous", w: ["Tiny", "Narrow", "Gentle"] },
+      { q: "Complete the proverb: \"A stitch in time saves ___.\"", c: "Nine", w: ["Ten", "Time", "Money"] },
+      { q: "Which of these words is a palindrome, reading the same backwards?", c: "Level", w: ["Lever", "Label", "Legal"] },
+      { q: "How many letters are in the English alphabet?", c: "26", w: ["24", "25", "28"] },
+      { q: "What does the idiom \"a piece of cake\" mean?", c: "Very easy", w: ["Very tasty", "Very small", "Very expensive"] },
+      { q: "What is the plural of \"child\"?", c: "Children", w: ["Childs", "Childrens", "Childes"] },
+      { q: "Which of these words starts with a silent letter?", c: "Knife", w: ["Kite", "Kettle", "Kitchen"] }
+    ]
+  };
+  var CAT_LABEL = { football: "Football", general: "General knowledge", words: "Word play" };
+  var TOPIC_LABEL = { mixed: "Mixed", football: "Football", general: "General knowledge", words: "Word play" };
+
+  function $(s) { return document.querySelector(s); }
+  function shuffle(a) {
+    var r = a.slice();
+    for (var i = r.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = r[i]; r[i] = r[j]; r[j] = t;
+    }
+    return r;
+  }
+  function show(id) {
+    ["home", "lobby", "play", "end"].forEach(function (s) { $("#scr-" + s).hidden = s !== id; });
+    window.scrollTo(0, 0);
+  }
+  function send(conn, m) { try { if (conn && conn.open) conn.send(m); } catch (e) {} }
+  function makeCode() {
+    var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", s = "";
+    for (var i = 0; i < 5; i++) s += a.charAt(Math.floor(Math.random() * a.length));
+    return s;
+  }
+  function cleanName(n) { return (n || "").replace(/\s+/g, " ").trim().slice(0, 14) || "Player"; }
+  function baseLink() { try { return location.origin + location.pathname; } catch (e) { return ""; } }
+
+  var role = null;      // "host" or "guest"
+  var peer = null;      // this phone's PeerJS peer
+  var hostConn = null;  // guest only: connection to the host
+  var code = "";
+  var myName = "";
+  var H = null;         // host only: room and game state
+  var G = null;         // this phone's current question view
+  var playTimer = null, joinTimer = null, leaving = false;
+
+  /* ---------- leaving and errors ---------- */
+
+  function teardown() {
+    leaving = true;
+    clearInterval(playTimer);
+    clearTimeout(joinTimer);
+    if (H) { clearTimeout(H.tOut); clearTimeout(H.next); }
+    try { if (hostConn) hostConn.close(); } catch (e) {}
+    try { if (peer) peer.destroy(); } catch (e) {}
+    peer = null; hostConn = null; H = null; G = null; role = null;
+  }
+  function leave(message, isError) {
+    teardown();
+    var m = $("#homeMsg");
+    m.textContent = message || "";
+    m.className = "note" + (isError ? " err" : "");
+    $("#create").disabled = false;
+    $("#join").disabled = false;
+    show("home");
+  }
+
+  /* ---------- host: rooms and game flow ---------- */
+
+  function createRoom() {
+    var m = $("#homeMsg");
+    if (typeof Peer === "undefined") { m.textContent = "Online play could not load. Check your internet and refresh the page."; m.className = "note err"; return; }
+    myName = cleanName($("#name").value);
+    m.textContent = "Creating your room...";
+    m.className = "note";
+    $("#create").disabled = true;
+    $("#join").disabled = true;
+    leaving = false;
+    role = "host";
+    tryCreate(0);
+  }
+
+  function tryCreate(tries) {
+    code = makeCode();
+    var p = new Peer(PREFIX + code);
+    peer = p;
+    p.on("open", function () {
+      H = {
+        players: [{ id: "host", name: myName, conn: null, score: 0, right: 0, streak: 0, done: false, choice: null, t: 0, delta: 0, ok: false }],
+        topic: "mixed", started: false, deck: [], i: 0, ci: 0, qStart: 0, revealed: false, tOut: null, next: null
+      };
+      var radios = document.querySelectorAll('input[name="tcat"]');
+      Array.prototype.forEach.call(radios, function (r) { r.checked = r.value === "mixed"; });
+      broadcastLobby();
+    });
+    p.on("connection", onGuestConn);
+    p.on("disconnected", function () { try { p.reconnect(); } catch (e) {} });
+    p.on("error", function (e) {
+      if (leaving) return;
+      if (e.type === "unavailable-id" && tries < 4) { try { p.destroy(); } catch (x) {} tryCreate(tries + 1); return; }
+      if (H) { setLobbyNote("Connection problem. Friends may not be able to join."); return; }
+      leave("Could not create a room. Check your internet and try again.", true);
+    });
+  }
+
+  function onGuestConn(conn) {
+    conn.on("data", function (m) { hostOnData(conn, m); });
+    conn.on("close", function () { hostRemove(conn); });
+    conn.on("error", function () { hostRemove(conn); });
+  }
+
+  function uniqueName(n) {
+    var base = n, k = 2;
+    function taken(x) { return H.players.some(function (p) { return p.name.toLowerCase() === x.toLowerCase(); }); }
+    while (taken(n)) { n = base + " " + k; k++; }
+    return n;
+  }
+
+  function hostOnData(conn, m) {
+    if (!H || !m || typeof m !== "object") return;
+    if (m.t === "join") {
+      var known = H.players.some(function (p) { return p.conn === conn; });
+      if (known) return;
+      if (H.started) { send(conn, { t: "err", msg: "That game has already started." }); return; }
+      if (H.players.length >= MAXP) { send(conn, { t: "err", msg: "That room is full." }); return; }
+      var name = uniqueName(cleanName(m.name));
+      H.players.push({ id: conn.peer, name: name, conn: conn, score: 0, right: 0, streak: 0, done: false, choice: null, t: 0, delta: 0, ok: false });
+      send(conn, { t: "welcome", name: name });
+      broadcastLobby();
+    } else if (m.t === "a") {
+      var pl = H.players.filter(function (p) { return p.conn === conn; })[0];
+      if (pl) hostRecord(pl, m.i, m.idx);
+    }
+  }
+
+  function hostRemove(conn) {
+    if (!H) return;
+    var idx = -1;
+    H.players.forEach(function (p, i) { if (p.conn === conn) idx = i; });
+    if (idx < 0) return;
+    H.players.splice(idx, 1);
+    if (H.started) {
+      if (!H.revealed && H.players.every(function (p) { return p.done; })) hostReveal();
+    } else {
+      broadcastLobby();
+    }
+  }
+
+  function broadcast(m) { if (H) H.players.forEach(function (p) { if (p.conn) send(p.conn, m); }); }
+
+  function broadcastLobby() {
+    var m = { t: "lobby", players: H.players.map(function (p, i) { return { name: p.name, host: i === 0 }; }), topic: H.topic, code: code };
+    broadcast(m);
+    renderLobby(m);
+  }
+
+  function hostStart() {
+    if (!H || H.started || H.players.length < 2) return;
+    var pool = [];
+    Object.keys(BANK).forEach(function (k) {
+      if (H.topic === "mixed" || H.topic === k) BANK[k].forEach(function (q) { pool.push({ q: q.q, c: q.c, w: q.w, cat: k }); });
+    });
+    H.deck = shuffle(pool).slice(0, ROUND);
+    H.started = true;
+    H.players.forEach(function (p) { p.score = 0; p.right = 0; p.streak = 0; });
+    hostNext(0);
+  }
+
+  function hostNext(i) {
+    if (!H) return;
+    if (i >= H.deck.length) { hostEnd(); return; }
+    H.i = i;
+    var q = H.deck[i];
+    var opts = shuffle([q.c].concat(q.w));
+    H.ci = opts.indexOf(q.c);
+    H.revealed = false;
+    H.players.forEach(function (p) { p.done = false; p.choice = null; p.t = 0; });
+    H.qStart = Date.now();
+    var msg = { t: "q", i: i, total: H.deck.length, cat: CAT_LABEL[q.cat], q: q.q, opts: opts, secs: SECONDS };
+    broadcast(msg);
+    showQuestion(msg);
+    clearTimeout(H.tOut);
+    H.tOut = setTimeout(hostReveal, (SECONDS + 2) * 1000);
+  }
+
+  function hostRecord(p, i, idx) {
+    if (!H || !H.started || H.revealed || i !== H.i || p.done) return;
+    if (typeof idx !== "number" || idx < 0 || idx > 3 || idx % 1 !== 0) return;
+    p.done = true;
+    p.choice = idx;
+    p.t = Date.now();
+    if (H.players.every(function (x) { return x.done; })) hostReveal();
+  }
+
+  function hostReveal() {
+    if (!H || !H.started || H.revealed) return;
+    H.revealed = true;
+    clearTimeout(H.tOut);
+    H.players.forEach(function (p) {
+      var ok = p.done && p.choice === H.ci;
+      if (ok) {
+        var left = Math.max(0, SECONDS - (p.t - H.qStart) / 1000);
+        p.streak += 1;
+        p.right += 1;
+        p.delta = 100 + Math.round(left * 4) + Math.min((p.streak - 1) * 10, 50);
+      } else {
+        p.streak = 0;
+        p.delta = 0;
+      }
+      p.ok = ok;
+      p.score += p.delta;
+    });
+    var board = H.players.map(function (p) { return { name: p.name, score: p.score, delta: p.delta, ok: p.ok, answered: p.done }; });
+    board.sort(function (a, b) { return b.score - a.score; });
+    var msg = { t: "r", i: H.i, correct: H.ci, answer: H.deck[H.i].c, board: board, last: H.i + 1 >= H.deck.length };
+    broadcast(msg);
+    showReveal(msg);
+    clearTimeout(H.next);
+    H.next = setTimeout(function () { hostNext(H.i + 1); }, 5000);
+  }
+
+  function hostEnd() {
+    clearTimeout(H.tOut);
+    clearTimeout(H.next);
+    var board = H.players.map(function (p) { return { name: p.name, score: p.score, right: p.right }; });
+    board.sort(function (a, b) { return b.score - a.score; });
+    var msg = { t: "end", board: board, total: H.deck.length };
+    broadcast(msg);
+    showEnd(msg);
+  }
+
+  function hostBackToLobby() {
+    if (!H) return;
+    H.started = false;
+    H.players.forEach(function (p) { p.score = 0; p.right = 0; p.streak = 0; });
+    broadcastLobby();
+  }
+
+  /* ---------- guest: joining ---------- */
+
+  function joinRoom() {
+    var m = $("#homeMsg");
+    if (typeof Peer === "undefined") { m.textContent = "Online play could not load. Check your internet and refresh the page."; m.className = "note err"; return; }
+    var c = $("#joincode").value.trim().toUpperCase();
+    if (c.length !== 5) { m.textContent = "Enter the 5-letter room code from your friend."; m.className = "note err"; return; }
+    code = c;
+    myName = cleanName($("#name").value);
+    m.textContent = "Joining room " + c + "...";
+    m.className = "note";
+    $("#create").disabled = true;
+    $("#join").disabled = true;
+    leaving = false;
+    role = "guest";
+
+    var p = new Peer();
+    peer = p;
+    p.on("open", function () {
+      var conn = p.connect(PREFIX + c, { reliable: true });
+      hostConn = conn;
+      joinTimer = setTimeout(function () {
+        if (!leaving && !conn.open) leave("Could not reach that room. Check the code, or try a different network.", true);
+      }, 15000);
+      conn.on("open", function () {
+        clearTimeout(joinTimer);
+        send(conn, { t: "join", name: myName });
+      });
+      conn.on("data", guestOnData);
+      conn.on("close", function () { if (!leaving) leave("The host left the room.", true); });
+      conn.on("error", function () { if (!leaving) leave("Lost connection to the room.", true); });
+    });
+    p.on("error", function (e) {
+      if (leaving) return;
+      if (e.type === "peer-unavailable") leave("Room not found. Check the code and try again.", true);
+      else leave("Could not connect. Check your internet and try again.", true);
+    });
+  }
+
+  function guestOnData(m) {
+    if (!m || typeof m !== "object") return;
+    if (m.t === "welcome") myName = m.name;
+    else if (m.t === "lobby") { code = m.code || code; renderLobby(m); }
+    else if (m.t === "q") showQuestion(m);
+    else if (m.t === "r") showReveal(m);
+    else if (m.t === "end") showEnd(m);
+    else if (m.t === "err") leave(m.msg || "Could not join that room.", true);
+  }
+
+  /* ---------- screens (same for host and guests) ---------- */
+
+  function setLobbyNote(t) { $("#lobbyHint").textContent = t; }
+
+  function renderLobby(m) {
+    clearInterval(playTimer);
+    show("lobby");
+    var host = role === "host";
+    $("#roomCode").textContent = code;
+    var link = baseLink() + "?room=" + code;
+    var text = "Join my Quiz Huddle game! Room code: " + code + "\n" + link;
+    $("#invite").href = "https://wa.me/?text=" + encodeURIComponent(text);
+    $("#countLabel").textContent = "Players (" + m.players.length + " of " + MAXP + ")";
+    var ul = $("#plist");
+    ul.textContent = "";
+    m.players.forEach(function (p) {
+      var li = document.createElement("li");
+      var n = document.createElement("span"); n.className = "n"; n.textContent = p.name + (p.name === myName ? " (you)" : "");
+      li.appendChild(n);
+      if (p.host) { var t = document.createElement("span"); t.className = "tag"; t.textContent = "Host"; li.appendChild(t); }
+      ul.appendChild(li);
+    });
+    $("#topicChips").hidden = !host;
+    $("#topicText").hidden = host;
+    $("#topicText").textContent = "Topic: " + (TOPIC_LABEL[m.topic] || "Mixed");
+    $("#startBtn").hidden = !host;
+    $("#startBtn").disabled = m.players.length < 2;
+    setLobbyNote(host ? (m.players.length < 2 ? "Waiting for at least one friend to join." : "Ready when you are.") : "Waiting for the host to start.");
+  }
+
+  function showQuestion(m) {
+    clearInterval(playTimer);
+    show("play");
+    G = { i: m.i, opts: m.opts, locked: false, chosen: null };
+    $("#qcount").textContent = "Question " + (m.i + 1) + " of " + m.total;
+    $("#catlabel").textContent = m.cat;
+    $("#qtext").textContent = m.q;
+    $("#fb").textContent = "";
+    $("#fb").className = "feedback";
+    $("#roundBoard").textContent = "";
+    var box = $("#opts");
+    box.textContent = "";
+    m.opts.forEach(function (text, idx) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt";
+      var l = document.createElement("span"); l.className = "l"; l.textContent = "ABCD".charAt(idx);
+      var t = document.createElement("span"); t.className = "t"; t.textContent = text;
+      b.appendChild(l); b.appendChild(t);
+      b.addEventListener("click", function () { choose(idx); });
+      box.appendChild(b);
+    });
+    var deadline = Date.now() + m.secs * 1000;
+    function tick() {
+      var left = Math.max(0, (deadline - Date.now()) / 1000);
+      $("#bar").style.width = (left / m.secs * 100) + "%";
+      $("#bar").className = left <= 5 ? "low" : "";
+      $("#secs").textContent = Math.ceil(left);
+      if (left <= 0) {
+        clearInterval(playTimer);
+        if (G && !G.locked) {
+          G.locked = true;
+          lockButtons();
+          $("#fb").textContent = "Time's up. Waiting for the results...";
+        }
+      }
+    }
+    tick();
+    playTimer = setInterval(tick, 100);
+  }
+
+  function lockButtons() {
+    Array.prototype.forEach.call($("#opts").children, function (b) { b.disabled = true; });
+  }
+
+  function choose(idx) {
+    if (!G || G.locked) return;
+    G.locked = true;
+    G.chosen = idx;
+    lockButtons();
+    $("#opts").children[idx].classList.add("pick");
+    $("#fb").textContent = "Answer locked in. Waiting for the others...";
+    if (role === "host") hostRecord(H.players[0], G.i, idx);
+    else send(hostConn, { t: "a", i: G.i, idx: idx });
+  }
+
+  function renderBoard(el, rows, withDelta) {
+    el.textContent = "";
+    rows.forEach(function (r, i) {
+      var rank = 1;
+      rows.forEach(function (o) { if (o.score > r.score) rank++; });
+      var li = document.createElement("li");
+      if (r.name === myName) li.className = "me";
+      var rk = document.createElement("span"); rk.className = "rk"; rk.textContent = rank;
+      var n = document.createElement("span"); n.className = "n"; n.textContent = r.name + (r.name === myName ? " (you)" : "");
+      var d = document.createElement("span"); d.className = "d" + (r.delta > 0 ? " up" : "");
+      d.textContent = r.delta > 0 ? "+" + r.delta : (r.answered ? "wrong" : "no answer");
+      var v = document.createElement("span"); v.className = "v"; v.textContent = r.score;
+      li.appendChild(rk); li.appendChild(n); li.appendChild(d); li.appendChild(v);
+      el.appendChild(li);
+    });
+  }
+
+  function showReveal(m) {
+    clearInterval(playTimer);
+    if (!G) return;
+    G.locked = true;
+    var kids = $("#opts").children;
+    Array.prototype.forEach.call(kids, function (b, i) {
+      b.disabled = true;
+      b.classList.remove("pick");
+      if (i === m.correct) b.classList.add("good");
+      else if (i === G.chosen) b.classList.add("bad");
+      else b.classList.add("dim");
+    });
+    var me = null;
+    m.board.forEach(function (r) { if (r.name === myName) me = r; });
+    var fb = $("#fb");
+    if (me && me.ok) { fb.textContent = "Correct! +" + me.delta + " points"; fb.className = "feedback good"; }
+    else if (me && me.answered) { fb.textContent = "Not quite. The answer is " + m.answer + "."; fb.className = "feedback bad"; }
+    else { fb.textContent = "Time's up. The answer is " + m.answer + "."; fb.className = "feedback bad"; }
+    renderBoard($("#roundBoard"), m.board, true);
+  }
+
+  function showEnd(m) {
+    clearInterval(playTimer);
+    show("end");
+    var rows = m.board;
+    var me = null;
+    rows.forEach(function (r) { if (r.name === myName) me = r; });
+    var rank = 1;
+    if (me) rows.forEach(function (o) { if (o.score > me.score) rank++; });
+    var tied = me && rows.some(function (o) { return o !== me && o.score === me.score; });
+    var title = rows.length < 2 ? "Game over." : (rank === 1 ? (tied ? "You tied for first!" : "You won!") : "You finished #" + rank + ".");
+    $("#endTitle").textContent = title;
+
+    var ol = $("#finalBoard");
+    ol.textContent = "";
+    rows.forEach(function (r, i) {
+      var rk = 1;
+      rows.forEach(function (o) { if (o.score > r.score) rk++; });
+      var li = document.createElement("li");
+      li.className = (r.name === myName ? "me " : "") + (rk === 1 ? "first" : "");
+      var a = document.createElement("span"); a.className = "rk"; a.textContent = rk;
+      var n = document.createElement("span"); n.className = "n"; n.textContent = r.name + (r.name === myName ? " (you)" : "");
+      var d = document.createElement("span"); d.className = "d"; d.textContent = r.right + "/" + m.total + " right";
+      var v = document.createElement("span"); v.className = "v"; v.textContent = r.score;
+      li.appendChild(a); li.appendChild(n); li.appendChild(d); li.appendChild(v);
+      ol.appendChild(li);
+    });
+
+    var score = me ? me.score : 0;
+    var text;
+    if (rank === 1 && rows.length > 1 && !tied) {
+      text = "I won Quiz Huddle with " + score + " points against " + (rows.length - 1) + " friend" + (rows.length > 2 ? "s" : "") + "! Think you can beat me?";
+    } else if (rank === 1 && rows.length > 1) {
+      text = "I tied for first in Quiz Huddle with " + score + " points. Rematch?";
+    } else {
+      text = "I finished #" + rank + " of " + rows.length + " in Quiz Huddle with " + score + " points. Rematch?";
+    }
+    var link = baseLink();
+    if (link) text += " " + link;
+    $("#shareText").textContent = text;
+    $("#wa").href = "https://wa.me/?text=" + encodeURIComponent(text);
+    $("#again").hidden = role !== "host";
+    $("#waitAgain").hidden = role === "host";
+  }
+
+  /* ---------- wiring ---------- */
+
+  $("#create").addEventListener("click", createRoom);
+  $("#join").addEventListener("click", joinRoom);
+  $("#startBtn").addEventListener("click", hostStart);
+  $("#again").addEventListener("click", hostBackToLobby);
+  $("#leaveLobby").addEventListener("click", function () { leave(""); });
+  $("#leavePlay").addEventListener("click", function () { leave(""); });
+  $("#leaveEnd").addEventListener("click", function () { leave(""); });
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="tcat"]'), function (r) {
+    r.addEventListener("change", function () {
+      if (role === "host" && H && !H.started) { H.topic = r.value; broadcastLobby(); }
+    });
+  });
+
+  try {
+    var qs = new URLSearchParams(location.search).get("room");
+    if (qs) {
+      $("#joincode").value = qs.toUpperCase().slice(0, 5);
+      $("#homeMsg").textContent = "Enter your name, then tap Join.";
+    }
+  } catch (e) {}
+})();
+</script>
+</body>
+</html>
