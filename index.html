@@ -1,0 +1,632 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Quiz Huddle</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* Layout: one phone-width column that reads like a group chat; the quizmaster's questions arrive as message bubbles and answers are reply buttons. */
+  :root {
+    --bg: #EEF2F5;
+    --surface: #FFFFFF;
+    --ink: #10212B;
+    --muted: #55667A;
+    --line: #D3DCE3;
+    --accent: #2457F5;
+    --accent-ink: #FFFFFF;
+    --good: #0F7A57;
+    --good-bg: #DDF3EA;
+    --bad: #B93027;
+    --bad-bg: #FBE3E0;
+    --warn: #B86E00;
+    --font-display: "Bricolage Grotesque", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0E161B;
+      --surface: #17222A;
+      --ink: #E8EFF3;
+      --muted: #93A4B0;
+      --line: #2A3A45;
+      --accent: #6E93FF;
+      --accent-ink: #0E161B;
+      --good: #4FD1A0;
+      --good-bg: #123226;
+      --bad: #FF8479;
+      --bad-bg: #3A1A18;
+      --warn: #F2B552;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0E161B;
+    --surface: #17222A;
+    --ink: #E8EFF3;
+    --muted: #93A4B0;
+    --line: #2A3A45;
+    --accent: #6E93FF;
+    --accent-ink: #0E161B;
+    --good: #4FD1A0;
+    --good-bg: #123226;
+    --bad: #FF8479;
+    --bad-bg: #3A1A18;
+    --warn: #F2B552;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.5;
+    min-height: 100vh;
+  }
+  .app {
+    max-width: 30rem;
+    margin-inline: auto;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  section { display: flex; flex-direction: column; gap: 18px; }
+  h1, h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    margin: 0;
+    text-wrap: balance;
+  }
+  h1 { font-size: 2.6rem; }
+  h2 { font-size: 2rem; }
+  p { margin: 0; }
+  button, input { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* chat bubbles */
+  .msg {
+    padding: 12px 16px 14px;
+    max-width: 92%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  .msg p { overflow-wrap: anywhere; }
+  .msg-in {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 20px 20px 20px 4px;
+    align-self: flex-start;
+  }
+  .msg-out {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-radius: 20px 20px 4px 20px;
+    align-self: flex-end;
+  }
+  .who {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .q p { font-family: var(--font-display); font-weight: 600; font-size: 1.35rem; line-height: 1.25; }
+  .q { max-width: 100%; }
+
+  /* setup */
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; display: flex; flex-direction: column; gap: 10px; }
+  legend { padding: 0; margin-bottom: 10px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; }
+  .chip input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .chip span {
+    display: inline-block;
+    padding: 9px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    font-weight: 500;
+  }
+  .chip input:checked + span { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .chip input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+  .names { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .names input {
+    width: 100%;
+    min-width: 0;
+    padding: 11px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .names input:only-child { grid-column: 1 / -1; }
+  .best { color: var(--muted); font-size: 0.9rem; }
+
+  .primary, .secondary, .link {
+    cursor: pointer;
+    border-radius: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+  }
+  .primary {
+    display: block;
+    border: 0;
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 15px 20px;
+    font-size: 1.05rem;
+  }
+  .secondary {
+    display: block;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    padding: 13px 20px;
+  }
+  .primary:active, .secondary:active { transform: translateY(1px); }
+  .link { border: 0; background: none; color: var(--muted); padding: 6px 0; text-decoration: underline; border-radius: 6px; }
+
+  /* play */
+  .topbar { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .scores { display: flex; gap: 8px; }
+  .score {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1.5px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .score.on { border-color: var(--accent); }
+  .score .n { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .score .v { font-family: var(--font-display); font-weight: 800; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  .turn { font-weight: 600; min-height: 1.5em; }
+  .timer { display: flex; align-items: center; gap: 12px; }
+  .track { flex: 1; height: 10px; border-radius: 999px; background: var(--line); overflow: hidden; }
+  #bar { height: 100%; width: 100%; background: var(--accent); border-radius: 999px; }
+  #bar.low { background: var(--warn); }
+  #secs { font-family: var(--font-display); font-weight: 800; font-size: 1.4rem; width: 2ch; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .opts { display: flex; flex-direction: column; gap: 10px; }
+  .opt {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    text-align: left;
+    padding: 14px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: 16px;
+    background: var(--surface);
+    cursor: pointer;
+    min-width: 0;
+  }
+  .opt .l {
+    flex: none;
+    width: 2rem;
+    height: 2rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--bg);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .opt .t { min-width: 0; overflow-wrap: anywhere; font-weight: 500; }
+  .opt:hover:not(:disabled) { border-color: var(--accent); }
+  .opt:disabled { cursor: default; }
+  .opt.good { background: var(--good-bg); border-color: var(--good); }
+  .opt.bad { background: var(--bad-bg); border-color: var(--bad); }
+  .opt.good .l { background: var(--good); color: var(--bg); }
+  .opt.bad .l { background: var(--bad); color: var(--bg); }
+  .opt.dim { opacity: 0.55; }
+  .feedback { min-height: 1.5em; font-weight: 600; }
+  .feedback.good { color: var(--good); }
+  .feedback.bad { color: var(--bad); }
+
+  /* end */
+  .final { display: grid; gap: 10px; }
+  .final .score { padding: 14px 16px; }
+  .final .score .v { font-size: 2rem; }
+  .final .score .sub { color: var(--muted); font-size: 0.85rem; }
+  .final .win { border-color: var(--good); background: var(--good-bg); }
+  .actions { display: flex; flex-direction: column; gap: 10px; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    #bar { transition: width 0.12s linear; }
+    .opt, .primary, .secondary { transition: background-color 0.15s, border-color 0.15s, transform 0.1s; }
+  }
+</style>
+
+</head>
+<body>
+<main class="app">
+
+  <section id="scr-start">
+    <div>
+      <p class="eyebrow">Group chat trivia</p>
+      <h1>Quiz Huddle</h1>
+    </div>
+    <div class="msg msg-in">
+      <span class="who">Quizmaster</span>
+      <p>Ten questions, fifteen seconds each. The faster you answer, the more points you get. Pick a topic and let's go.</p>
+    </div>
+
+    <fieldset>
+      <legend class="eyebrow">Topic</legend>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="cat" value="mixed" checked><span>Mixed</span></label>
+        <label class="chip"><input type="radio" name="cat" value="football"><span>Football</span></label>
+        <label class="chip"><input type="radio" name="cat" value="general"><span>General</span></label>
+        <label class="chip"><input type="radio" name="cat" value="words"><span>Word play</span></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend class="eyebrow">Players</legend>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="np" value="1" checked><span>Just me</span></label>
+        <label class="chip"><input type="radio" name="np" value="2"><span>Two players, one phone</span></label>
+      </div>
+      <div class="names">
+        <input id="p1" type="text" maxlength="14" placeholder="Your name" aria-label="Player 1 name" autocomplete="off">
+        <input id="p2" type="text" maxlength="14" placeholder="Player 2 name" aria-label="Player 2 name" autocomplete="off" hidden>
+      </div>
+    </fieldset>
+
+    <button id="start" class="primary" type="button">Start quiz</button>
+    <p id="best" class="best"></p>
+  </section>
+
+  <section id="scr-play" hidden>
+    <div class="topbar">
+      <span id="qcount" class="eyebrow"></span>
+      <button id="quit" class="link" type="button">End quiz</button>
+    </div>
+    <div class="scores" id="scores"></div>
+    <p class="turn" id="turn"></p>
+    <div class="timer">
+      <div class="track"><div id="bar"></div></div>
+      <span id="secs">15</span>
+    </div>
+    <div class="msg msg-in q">
+      <span class="who" id="catlabel"></span>
+      <p id="qtext"></p>
+    </div>
+    <div class="opts" id="opts" role="group" aria-label="Answers"></div>
+    <p class="feedback" id="fb" aria-live="polite"></p>
+    <button id="next" class="primary" type="button" hidden>Next question</button>
+  </section>
+
+  <section id="scr-end" hidden>
+    <div>
+      <p class="eyebrow">Final whistle</p>
+      <h2 id="endTitle"></h2>
+    </div>
+    <div class="final" id="final"></div>
+    <div class="msg msg-out"><p id="shareText"></p></div>
+    <div class="actions">
+      <a id="wa" class="primary" href="#" target="_blank" rel="noopener">Send to a WhatsApp chat</a>
+      <button id="copy" class="secondary" type="button">Copy result</button>
+      <button id="again" class="secondary" type="button">Play again</button>
+    </div>
+  </section>
+
+</main>
+
+<script>
+(function () {
+  var ROUND = 10, SECONDS = 15;
+
+  var BANK = {
+    football: [
+      { q: "Which country won the 2022 FIFA World Cup?", c: "Argentina", w: ["France", "Brazil", "Croatia"] },
+      { q: "How many players does each team have on the pitch during a match?", c: "11", w: ["10", "9", "12"] },
+      { q: "Which country won the Africa Cup of Nations played in early 2024?", c: "Ivory Coast", w: ["Nigeria", "Senegal", "Egypt"] },
+      { q: "In which year did the Super Eagles win the Africa Cup of Nations in South Africa?", c: "2013", w: ["2010", "2004", "2019"] },
+      { q: "Which manager is nicknamed \"The Special One\"?", c: "José Mourinho", w: ["Pep Guardiola", "Arsène Wenger", "Jürgen Klopp"] },
+      { q: "Which country hosted the 2010 FIFA World Cup?", c: "South Africa", w: ["Germany", "Brazil", "Nigeria"] },
+      { q: "How long is a standard football match, not counting extra time?", c: "90 minutes", w: ["80 minutes", "100 minutes", "120 minutes"] },
+      { q: "Which player has won the most Ballon d'Or awards?", c: "Lionel Messi", w: ["Cristiano Ronaldo", "Michel Platini", "Johan Cruyff"] },
+      { q: "Which Nigerian striker was named CAF African Footballer of the Year in 2023?", c: "Victor Osimhen", w: ["Ademola Lookman", "Kelechi Iheanacho", "Wilfred Ndidi"] },
+      { q: "What colour card sends a player off the pitch?", c: "Red", w: ["Yellow", "Blue", "Green"] },
+      { q: "Which club plays its home games at Camp Nou?", c: "FC Barcelona", w: ["Real Madrid", "Juventus", "Bayern Munich"] },
+      { q: "Which player scored the famous \"Hand of God\" goal in 1986?", c: "Diego Maradona", w: ["Pelé", "Zinedine Zidane", "Ronaldinho"] }
+    ],
+    general: [
+      { q: "What is the capital city of Nigeria?", c: "Abuja", w: ["Lagos", "Kano", "Port Harcourt"] },
+      { q: "How many states does Nigeria have?", c: "36", w: ["30", "32", "37"] },
+      { q: "Which is the largest ocean on Earth?", c: "Pacific Ocean", w: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean"] },
+      { q: "What is the chemical symbol for gold?", c: "Au", w: ["Ag", "Go", "Gd"] },
+      { q: "Which is the longest river in Africa?", c: "The Nile", w: ["The Niger", "The Congo", "The Zambezi"] },
+      { q: "Which planet is known as the Red Planet?", c: "Mars", w: ["Venus", "Jupiter", "Mercury"] },
+      { q: "In which year did Nigeria gain independence?", c: "1960", w: ["1957", "1963", "1966"] },
+      { q: "Which is the largest country in Africa by land area?", c: "Algeria", w: ["Nigeria", "Democratic Republic of the Congo", "Sudan"] },
+      { q: "How many continents are there on Earth?", c: "7", w: ["5", "6", "8"] },
+      { q: "Who wrote the novel \"Things Fall Apart\"?", c: "Chinua Achebe", w: ["Wole Soyinka", "Chimamanda Ngozi Adichie", "Ben Okri"] },
+      { q: "Which Nigerian writer won the Nobel Prize in Literature in 1986?", c: "Wole Soyinka", w: ["Chinua Achebe", "Buchi Emecheta", "Cyprian Ekwensi"] },
+      { q: "Mount Kilimanjaro, the highest mountain in Africa, is in which country?", c: "Tanzania", w: ["Kenya", "Uganda", "Ethiopia"] }
+    ],
+    words: [
+      { q: "Which of these is the correct spelling?", c: "Definitely", w: ["Definately", "Definitly", "Defanitely"] },
+      { q: "Which of these is the correct spelling?", c: "Accommodation", w: ["Acommodation", "Accomodation", "Accommadation"] },
+      { q: "Which word is an anagram of \"heart\"?", c: "Earth", w: ["Hearth", "Hearty", "Thread"] },
+      { q: "What is the opposite of \"ancient\"?", c: "Modern", w: ["Old", "Historic", "Antique"] },
+      { q: "Which word means \"very happy\"?", c: "Elated", w: ["Gloomy", "Weary", "Frail"] },
+      { q: "Which word means the same as \"huge\"?", c: "Enormous", w: ["Tiny", "Narrow", "Gentle"] },
+      { q: "Complete the proverb: \"A stitch in time saves ___.\"", c: "Nine", w: ["Ten", "Time", "Money"] },
+      { q: "Which of these words is a palindrome, reading the same backwards?", c: "Level", w: ["Lever", "Label", "Legal"] },
+      { q: "How many letters are in the English alphabet?", c: "26", w: ["24", "25", "28"] },
+      { q: "What does the idiom \"a piece of cake\" mean?", c: "Very easy", w: ["Very tasty", "Very small", "Very expensive"] },
+      { q: "What is the plural of \"child\"?", c: "Children", w: ["Childs", "Childrens", "Childes"] },
+      { q: "Which of these words starts with a silent letter?", c: "Knife", w: ["Kite", "Kettle", "Kitchen"] }
+    ]
+  };
+  var CAT_LABEL = { football: "Football", general: "General knowledge", words: "Word play" };
+
+  function $(s) { return document.querySelector(s); }
+  function shuffle(a) {
+    var r = a.slice();
+    for (var i = r.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = r[i]; r[i] = r[j]; r[j] = t;
+    }
+    return r;
+  }
+  function checked(name) { return document.querySelector('input[name="' + name + '"]:checked').value; }
+  function show(id) {
+    ["start", "play", "end"].forEach(function (s) { $("#scr-" + s).hidden = s !== id; });
+    window.scrollTo(0, 0);
+  }
+
+  var g = null, timer = null, deadline = 0;
+  var BEST_KEY = "quizHuddleBest";
+
+  function readBest() { try { return parseInt(localStorage.getItem(BEST_KEY), 10) || 0; } catch (e) { return 0; } }
+  function writeBest(v) { try { localStorage.setItem(BEST_KEY, String(v)); } catch (e) {} }
+  function renderBest() {
+    var b = readBest();
+    $("#best").textContent = b ? "Your best solo score: " + b + " points" : "";
+  }
+
+  function syncPlayers() {
+    var two = checked("np") === "2";
+    $("#p2").hidden = !two;
+    $("#p1").placeholder = two ? "Player 1 name" : "Your name";
+  }
+
+  function start() {
+    var cat = checked("cat");
+    var np = parseInt(checked("np"), 10);
+    var n1 = $("#p1").value.trim() || (np === 1 ? "You" : "Player 1");
+    var n2 = $("#p2").value.trim() || "Player 2";
+    var pool = [];
+    Object.keys(BANK).forEach(function (k) {
+      if (cat === "mixed" || cat === k) BANK[k].forEach(function (q) { pool.push({ q: q.q, c: q.c, w: q.w, cat: k }); });
+    });
+    g = {
+      cat: cat,
+      np: np,
+      deck: shuffle(pool).slice(0, ROUND),
+      i: 0,
+      locked: false,
+      opts: [],
+      players: [n1, n2].slice(0, np).map(function (n) { return { name: n, score: 0, right: 0, streak: 0 }; })
+    };
+    show("play");
+    renderQ();
+  }
+
+  function renderScores() {
+    var turn = g.i % g.np;
+    var box = $("#scores");
+    box.textContent = "";
+    g.players.forEach(function (p, idx) {
+      var d = document.createElement("div");
+      d.className = "score" + (g.np > 1 && idx === turn ? " on" : "");
+      var n = document.createElement("span"); n.className = "n"; n.textContent = p.name;
+      var v = document.createElement("span"); v.className = "v"; v.textContent = p.score;
+      d.appendChild(n); d.appendChild(v);
+      box.appendChild(d);
+    });
+  }
+
+  function renderQ() {
+    var q = g.deck[g.i];
+    g.opts = shuffle([q.c].concat(q.w));
+    g.locked = false;
+    $("#qcount").textContent = "Question " + (g.i + 1) + " of " + g.deck.length;
+    $("#catlabel").textContent = CAT_LABEL[q.cat];
+    $("#qtext").textContent = q.q;
+    $("#turn").textContent = g.np > 1 ? g.players[g.i % g.np].name + ", you're up. Pass the phone." : "";
+    $("#fb").textContent = "";
+    $("#fb").className = "feedback";
+    $("#next").hidden = true;
+    renderScores();
+
+    var box = $("#opts");
+    box.textContent = "";
+    g.opts.forEach(function (text, idx) {
+      var b = document.createElement("button");
+      b.type = "button";
+      b.className = "opt";
+      b.dataset.i = idx;
+      var l = document.createElement("span"); l.className = "l"; l.textContent = "ABCD".charAt(idx);
+      var t = document.createElement("span"); t.className = "t"; t.textContent = text;
+      b.appendChild(l); b.appendChild(t);
+      b.addEventListener("click", function () { answer(idx); });
+      box.appendChild(b);
+    });
+
+    clearInterval(timer);
+    deadline = Date.now() + SECONDS * 1000;
+    tick();
+    timer = setInterval(tick, 100);
+  }
+
+  function tick() {
+    var left = Math.max(0, (deadline - Date.now()) / 1000);
+    $("#bar").style.width = (left / SECONDS * 100) + "%";
+    $("#bar").className = left <= 5 ? "low" : "";
+    $("#secs").textContent = Math.ceil(left);
+    if (left <= 0) answer(null);
+  }
+
+  function answer(idx) {
+    if (!g || g.locked) return;
+    g.locked = true;
+    clearInterval(timer);
+    var left = Math.max(0, (deadline - Date.now()) / 1000);
+    var q = g.deck[g.i];
+    var p = g.players[g.i % g.np];
+    var chosen = idx === null ? null : g.opts[idx];
+    var right = chosen === q.c;
+    var fb = $("#fb");
+
+    if (right) {
+      p.streak += 1;
+      p.right += 1;
+      var pts = 100 + Math.round(left * 4) + Math.min((p.streak - 1) * 10, 50);
+      p.score += pts;
+      fb.textContent = "Correct! +" + pts + " points" + (p.streak > 1 ? " (" + p.streak + " in a row)" : "");
+      fb.className = "feedback good";
+    } else {
+      p.streak = 0;
+      fb.textContent = chosen === null ? "Time's up. The answer is " + q.c + "." : "Not quite. The answer is " + q.c + ".";
+      fb.className = "feedback bad";
+    }
+
+    Array.prototype.forEach.call($("#opts").children, function (b, i) {
+      b.disabled = true;
+      if (g.opts[i] === q.c) b.classList.add("good");
+      else if (i === idx) b.classList.add("bad");
+      else b.classList.add("dim");
+    });
+    renderScores();
+
+    var next = $("#next");
+    next.textContent = g.i + 1 >= g.deck.length ? "See results" : "Next question";
+    next.hidden = false;
+    next.focus();
+  }
+
+  function advance() {
+    if (g.i + 1 >= g.deck.length) { finish(); return; }
+    g.i += 1;
+    renderQ();
+  }
+
+  function finish() {
+    clearInterval(timer);
+    var total = g.deck.length;
+    var box = $("#final");
+    box.textContent = "";
+    var best = g.players.reduce(function (a, b) { return b.score > a.score ? b : a; });
+    var tie = g.np > 1 && g.players[0].score === g.players[1].score;
+
+    g.players.forEach(function (p) {
+      var d = document.createElement("div");
+      d.className = "score" + (g.np > 1 && !tie && p === best ? " win" : "");
+      var left = document.createElement("div");
+      var n = document.createElement("div"); n.className = "n"; n.textContent = p.name;
+      var s = document.createElement("div"); s.className = "sub"; s.textContent = p.right + " of " + total + " right";
+      left.appendChild(n); left.appendChild(s);
+      var v = document.createElement("span"); v.className = "v"; v.textContent = p.score;
+      d.appendChild(left); d.appendChild(v);
+      box.appendChild(d);
+    });
+
+    var title, text;
+    if (g.np === 1) {
+      var p = g.players[0];
+      var prev = readBest();
+      title = p.score > prev && prev > 0 ? "New personal best!" : p.right >= 8 ? "Big brain energy." : p.right >= 5 ? "Solid round." : "Warm-up done.";
+      if (p.score > prev) writeBest(p.score);
+      text = "I scored " + p.score + " points (" + p.right + "/" + total + " right) on Quiz Huddle. Can you beat me?";
+    } else {
+      var a = g.players[0], b = g.players[1];
+      title = tie ? "It's a draw." : best.name + " wins!";
+      text = (tie ? "Quiz Huddle ended in a draw: " : best.name + " won Quiz Huddle: ") + a.name + " " + a.score + ", " + b.name + " " + b.score + ". Rematch?";
+    }
+    try {
+      if (/^https?:/.test(location.protocol)) text += " " + location.href.split("#")[0];
+    } catch (e) {}
+
+    $("#endTitle").textContent = title;
+    $("#shareText").textContent = text;
+    $("#wa").href = "https://wa.me/?text=" + encodeURIComponent(text);
+    $("#copy").textContent = "Copy result";
+    renderBest();
+    show("end");
+  }
+
+  function copyResult() {
+    var text = $("#shareText").textContent;
+    var btn = $("#copy");
+    function done() { btn.textContent = "Copied"; }
+    function fallback() {
+      var r = document.createRange();
+      r.selectNodeContents($("#shareText"));
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      btn.textContent = "Press and hold to copy";
+    }
+    try {
+      navigator.clipboard.writeText(text).then(done, fallback);
+    } catch (e) { fallback(); }
+  }
+
+  function toStart() {
+    clearInterval(timer);
+    g = null;
+    renderBest();
+    show("start");
+  }
+
+  $("#start").addEventListener("click", start);
+  $("#next").addEventListener("click", advance);
+  $("#quit").addEventListener("click", toStart);
+  $("#again").addEventListener("click", toStart);
+  $("#copy").addEventListener("click", copyResult);
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="np"]'), function (r) {
+    r.addEventListener("change", syncPlayers);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (!g || $("#scr-play").hidden || g.locked || e.ctrlKey || e.metaKey || e.altKey) return;
+    var k = e.key.toLowerCase();
+    var i = "1234".indexOf(k);
+    if (i < 0) i = "abcd".indexOf(k);
+    if (i >= 0 && i < g.opts.length) answer(i);
+  });
+
+  syncPlayers();
+  renderBest();
+})();
+</script>
+
+</body>
+</html>
