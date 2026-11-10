@@ -318,6 +318,20 @@
 (function () {
   var ROUND = 10, SECONDS = 15, MAXP = 6, PREFIX = "quizhuddle-";
 
+  /* Relay servers so phones on mobile data can still connect to each other. */
+  var PEER_OPTIONS = {
+    config: {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" },
+        { urls: "stun:stun.relay.metered.ca:80" },
+        { urls: "turn:global.relay.metered.ca:80", username: "be8c8e13429772d64c8b7f14", credential: "CtEzVRBBogzBnZ73" },
+        { urls: "turn:global.relay.metered.ca:80?transport=tcp", username: "be8c8e13429772d64c8b7f14", credential: "CtEzVRBBogzBnZ73" },
+        { urls: "turn:global.relay.metered.ca:443", username: "be8c8e13429772d64c8b7f14", credential: "CtEzVRBBogzBnZ73" },
+        { urls: "turns:global.relay.metered.ca:443?transport=tcp", username: "be8c8e13429772d64c8b7f14", credential: "CtEzVRBBogzBnZ73" }
+      ]
+    }
+  };
+
   var BANK = {
     football: [
       { q: "Which country won the 2022 FIFA World Cup?", c: "Argentina", w: ["France", "Brazil", "Croatia"] },
@@ -434,7 +448,7 @@
 
   function tryCreate(tries) {
     code = makeCode();
-    var p = new Peer(PREFIX + code);
+    var p = new Peer(PREFIX + code, PEER_OPTIONS);
     peer = p;
     p.on("open", function () {
       H = {
@@ -604,7 +618,7 @@
     leaving = false;
     role = "guest";
 
-    var p = new Peer();
+    var p = new Peer(undefined, PEER_OPTIONS);
     peer = p;
     p.on("open", function () {
       var conn = p.connect(PREFIX + c, { reliable: true });
