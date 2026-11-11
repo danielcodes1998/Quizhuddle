@@ -270,6 +270,16 @@
         <label class="chip"><input type="radio" name="tcat" value="football"><span>Football</span></label>
         <label class="chip"><input type="radio" name="tcat" value="general"><span>General</span></label>
         <label class="chip"><input type="radio" name="tcat" value="words"><span>Word play</span></label>
+        <label class="chip"><input type="radio" name="tcat" value="nigeria"><span>Nigeria</span></label>
+        <label class="chip"><input type="radio" name="tcat" value="science"><span>Science and tech</span></label>
+      </div>
+    </fieldset>
+    <fieldset id="levelChips">
+      <legend class="eyebrow">Level</legend>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="tlvl" value="easy"><span>Easy</span></label>
+        <label class="chip"><input type="radio" name="tlvl" value="medium" checked><span>Medium</span></label>
+        <label class="chip"><input type="radio" name="tlvl" value="hard"><span>Hard</span></label>
       </div>
     </fieldset>
     <p id="topicText" class="muted"></p>
@@ -333,51 +343,350 @@
   };
 
   var BANK = {
-    football: [
-      { q: "Which country won the 2022 FIFA World Cup?", c: "Argentina", w: ["France", "Brazil", "Croatia"] },
-      { q: "How many players does each team have on the pitch during a match?", c: "11", w: ["10", "9", "12"] },
-      { q: "Which country won the Africa Cup of Nations played in early 2024?", c: "Ivory Coast", w: ["Nigeria", "Senegal", "Egypt"] },
-      { q: "In which year did the Super Eagles win the Africa Cup of Nations in South Africa?", c: "2013", w: ["2010", "2004", "2019"] },
-      { q: "Which manager is nicknamed \"The Special One\"?", c: "José Mourinho", w: ["Pep Guardiola", "Arsène Wenger", "Jürgen Klopp"] },
-      { q: "Which country hosted the 2010 FIFA World Cup?", c: "South Africa", w: ["Germany", "Brazil", "Nigeria"] },
-      { q: "How long is a standard football match, not counting extra time?", c: "90 minutes", w: ["80 minutes", "100 minutes", "120 minutes"] },
-      { q: "Which player has won the most Ballon d'Or awards?", c: "Lionel Messi", w: ["Cristiano Ronaldo", "Michel Platini", "Johan Cruyff"] },
-      { q: "Which Nigerian striker was named CAF African Footballer of the Year in 2023?", c: "Victor Osimhen", w: ["Ademola Lookman", "Kelechi Iheanacho", "Wilfred Ndidi"] },
-      { q: "What colour card sends a player off the pitch?", c: "Red", w: ["Yellow", "Blue", "Green"] },
-      { q: "Which club plays its home games at Camp Nou?", c: "FC Barcelona", w: ["Real Madrid", "Juventus", "Bayern Munich"] },
-      { q: "Which player scored the famous \"Hand of God\" goal in 1986?", c: "Diego Maradona", w: ["Pelé", "Zinedine Zidane", "Ronaldinho"] }
-    ],
-    general: [
-      { q: "What is the capital city of Nigeria?", c: "Abuja", w: ["Lagos", "Kano", "Port Harcourt"] },
-      { q: "How many states does Nigeria have?", c: "36", w: ["30", "32", "37"] },
-      { q: "Which is the largest ocean on Earth?", c: "Pacific Ocean", w: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean"] },
-      { q: "What is the chemical symbol for gold?", c: "Au", w: ["Ag", "Go", "Gd"] },
-      { q: "Which is the longest river in Africa?", c: "The Nile", w: ["The Niger", "The Congo", "The Zambezi"] },
-      { q: "Which planet is known as the Red Planet?", c: "Mars", w: ["Venus", "Jupiter", "Mercury"] },
-      { q: "In which year did Nigeria gain independence?", c: "1960", w: ["1957", "1963", "1966"] },
-      { q: "Which is the largest country in Africa by land area?", c: "Algeria", w: ["Nigeria", "Democratic Republic of the Congo", "Sudan"] },
-      { q: "How many continents are there on Earth?", c: "7", w: ["5", "6", "8"] },
-      { q: "Who wrote the novel \"Things Fall Apart\"?", c: "Chinua Achebe", w: ["Wole Soyinka", "Chimamanda Ngozi Adichie", "Ben Okri"] },
-      { q: "Which Nigerian writer won the Nobel Prize in Literature in 1986?", c: "Wole Soyinka", w: ["Chinua Achebe", "Buchi Emecheta", "Cyprian Ekwensi"] },
-      { q: "Mount Kilimanjaro, the highest mountain in Africa, is in which country?", c: "Tanzania", w: ["Kenya", "Uganda", "Ethiopia"] }
-    ],
-    words: [
-      { q: "Which of these is the correct spelling?", c: "Definitely", w: ["Definately", "Definitly", "Defanitely"] },
-      { q: "Which of these is the correct spelling?", c: "Accommodation", w: ["Acommodation", "Accomodation", "Accommadation"] },
-      { q: "Which word is an anagram of \"heart\"?", c: "Earth", w: ["Hearth", "Hearty", "Thread"] },
-      { q: "What is the opposite of \"ancient\"?", c: "Modern", w: ["Old", "Historic", "Antique"] },
-      { q: "Which word means \"very happy\"?", c: "Elated", w: ["Gloomy", "Weary", "Frail"] },
-      { q: "Which word means the same as \"huge\"?", c: "Enormous", w: ["Tiny", "Narrow", "Gentle"] },
-      { q: "Complete the proverb: \"A stitch in time saves ___.\"", c: "Nine", w: ["Ten", "Time", "Money"] },
-      { q: "Which of these words is a palindrome, reading the same backwards?", c: "Level", w: ["Lever", "Label", "Legal"] },
-      { q: "How many letters are in the English alphabet?", c: "26", w: ["24", "25", "28"] },
-      { q: "What does the idiom \"a piece of cake\" mean?", c: "Very easy", w: ["Very tasty", "Very small", "Very expensive"] },
-      { q: "What is the plural of \"child\"?", c: "Children", w: ["Childs", "Childrens", "Childes"] },
-      { q: "Which of these words starts with a silent letter?", c: "Knife", w: ["Kite", "Kettle", "Kitchen"] }
-    ]
+    football: {
+      easy: [
+        { q: "How many players does each team have on the pitch during a match?", c: "11", w: ["10", "9", "12"] },
+        { q: "What colour card sends a player off the pitch?", c: "Red", w: ["Yellow", "Blue", "Green"] },
+        { q: "How long is a standard football match, not counting extra time?", c: "90 minutes", w: ["80 minutes", "100 minutes", "120 minutes"] },
+        { q: "Which country won the 2022 FIFA World Cup?", c: "Argentina", w: ["France", "Brazil", "Croatia"] },
+        { q: "Which footballer is nicknamed \"CR7\"?", c: "Cristiano Ronaldo", w: ["Lionel Messi", "Neymar", "Kylian Mbappé"] },
+        { q: "How many points does a team get for winning a league match?", c: "3", w: ["1", "2", "4"] },
+        { q: "Which club plays its home games at Old Trafford?", c: "Manchester United", w: ["Liverpool", "Arsenal", "Chelsea"] },
+        { q: "What is the nickname of Nigeria's national football team?", c: "Super Eagles", w: ["Black Stars", "Indomitable Lions", "Pharaohs"] },
+        { q: "Which part of the body can outfield players not use to play the ball?", c: "Hands", w: ["Head", "Chest", "Knees"] },
+        { q: "What is it called when a player scores three goals in one match?", c: "Hat-trick", w: ["Double", "Treble", "Brace"] },
+        { q: "Which club plays its home games at Camp Nou?", c: "FC Barcelona", w: ["Real Madrid", "Juventus", "Bayern Munich"] },
+        { q: "Which country hosted the 2010 FIFA World Cup?", c: "South Africa", w: ["Germany", "Brazil", "Nigeria"] },
+        { q: "What is the kick called that is awarded for a foul inside the penalty area?", c: "Penalty", w: ["Free kick", "Corner", "Throw-in"] },
+        { q: "Which player is allowed to use their hands inside their own penalty area?", c: "Goalkeeper", w: ["Captain", "Defender", "Striker"] },
+        { q: "Which colour are Brazil's famous home shirts?", c: "Yellow", w: ["Blue", "Green", "White"] },
+        { q: "Which tournament is played every four years between national teams?", c: "World Cup", w: ["Champions League", "Copa Libertadores", "FA Cup"] },
+        { q: "Which London club is nicknamed \"The Gunners\"?", c: "Arsenal", w: ["Chelsea", "Tottenham", "Everton"] },
+        { q: "Which country do the \"Three Lions\" represent?", c: "England", w: ["Scotland", "Wales", "Ireland"] },
+        { q: "What is the nickname of Cameroon's national team?", c: "Indomitable Lions", w: ["Super Eagles", "Black Stars", "Elephants"] },
+        { q: "What is the line called that the ball must fully cross for a goal to count?", c: "Goal line", w: ["Touchline", "Halfway line", "Penalty spot"] }
+      ],
+      medium: [
+        { q: "Which Nigerian striker was named CAF African Footballer of the Year in 2023?", c: "Victor Osimhen", w: ["Ademola Lookman", "Kelechi Iheanacho", "Wilfred Ndidi"] },
+        { q: "Which country won the Africa Cup of Nations played in early 2024?", c: "Ivory Coast", w: ["Nigeria", "Senegal", "Egypt"] },
+        { q: "In which year did the Super Eagles win the Africa Cup of Nations in South Africa?", c: "2013", w: ["2010", "2004", "2019"] },
+        { q: "Which manager is nicknamed \"The Special One\"?", c: "José Mourinho", w: ["Pep Guardiola", "Arsène Wenger", "Jürgen Klopp"] },
+        { q: "Which player has won the most Ballon d'Or awards?", c: "Lionel Messi", w: ["Cristiano Ronaldo", "Michel Platini", "Johan Cruyff"] },
+        { q: "Which club plays its home games at the Santiago Bernabéu?", c: "Real Madrid", w: ["Atlético Madrid", "Valencia", "Villarreal"] },
+        { q: "Which player scored the famous \"Hand of God\" goal in 1986?", c: "Diego Maradona", w: ["Pelé", "Zinedine Zidane", "Ronaldinho"] },
+        { q: "Which country hosted the 2018 FIFA World Cup?", c: "Russia", w: ["Qatar", "Brazil", "Germany"] },
+        { q: "Which country won the 2018 FIFA World Cup?", c: "France", w: ["Croatia", "Belgium", "England"] },
+        { q: "Which club did Lionel Messi leave to join Paris Saint-Germain in 2021?", c: "FC Barcelona", w: ["Real Madrid", "Manchester City", "Inter Miami"] },
+        { q: "Which goalkeeper captained Nigeria and starred at the 2010 and 2014 World Cups?", c: "Vincent Enyeama", w: ["Carl Ikeme", "Austin Ejide", "Peter Rufai"] },
+        { q: "Which country has won the most FIFA World Cups?", c: "Brazil", w: ["Germany", "Italy", "Argentina"] },
+        { q: "Who is the all-time top scorer in the Premier League?", c: "Alan Shearer", w: ["Wayne Rooney", "Harry Kane", "Thierry Henry"] },
+        { q: "Which club is nicknamed the \"Red Devils\"?", c: "Manchester United", w: ["Liverpool", "Arsenal", "Benfica"] },
+        { q: "Which Nigerian striker won the 1996 Olympic gold and later won the Premier League with Arsenal?", c: "Nwankwo Kanu", w: ["Jay-Jay Okocha", "Daniel Amokachi", "Finidi George"] },
+        { q: "Which Egyptian forward won the 2018 PFA Players' Player of the Year award with Liverpool?", c: "Mohamed Salah", w: ["Sadio Mané", "Riyad Mahrez", "Mohamed Elneny"] },
+        { q: "Which country won Euro 2020, played in 2021?", c: "Italy", w: ["England", "Spain", "France"] },
+        { q: "Who won the Golden Boot at the 2022 World Cup with eight goals?", c: "Kylian Mbappé", w: ["Lionel Messi", "Olivier Giroud", "Julián Álvarez"] },
+        { q: "Which manager retired in 2013 after winning the Premier League with Manchester United?", c: "Alex Ferguson", w: ["David Moyes", "José Mourinho", "Louis van Gaal"] },
+        { q: "Which country does Sadio Mané represent?", c: "Senegal", w: ["Mali", "Ghana", "Guinea"] }
+      ],
+      hard: [
+        { q: "Which country hosted the 1994 FIFA World Cup?", c: "United States", w: ["Mexico", "Italy", "France"] },
+        { q: "Which country won the first FIFA World Cup in 1930?", c: "Uruguay", w: ["Argentina", "Brazil", "Italy"] },
+        { q: "Who scored 13 goals at a single World Cup, in 1958?", c: "Just Fontaine", w: ["Gerd Müller", "Ronaldo", "Miroslav Klose"] },
+        { q: "Who is the all-time top scorer in World Cup history, with 16 goals?", c: "Miroslav Klose", w: ["Ronaldo", "Gerd Müller", "Pelé"] },
+        { q: "Which club won the first European Cup in 1956?", c: "Real Madrid", w: ["AC Milan", "Benfica", "Manchester United"] },
+        { q: "Which English club went the whole 2003-04 Premier League season unbeaten?", c: "Arsenal", w: ["Chelsea", "Manchester United", "Liverpool"] },
+        { q: "Which country shocked Europe by winning Euro 2004?", c: "Greece", w: ["Portugal", "Czech Republic", "Netherlands"] },
+        { q: "Who scored the winning goal for Spain in the 2010 World Cup final?", c: "Andrés Iniesta", w: ["David Villa", "Xavi", "Fernando Torres"] },
+        { q: "Nigeria won Olympic football gold in 1996. Which country did they beat in the final?", c: "Argentina", w: ["Brazil", "Ghana", "Mexico"] },
+        { q: "In which country did Nigeria win the 1994 Africa Cup of Nations?", c: "Tunisia", w: ["Egypt", "Burkina Faso", "Ivory Coast"] },
+        { q: "Who is the all-time top scorer in the UEFA Champions League?", c: "Cristiano Ronaldo", w: ["Lionel Messi", "Robert Lewandowski", "Karim Benzema"] },
+        { q: "Who won the Golden Glove for best goalkeeper at the 2018 World Cup?", c: "Thibaut Courtois", w: ["Hugo Lloris", "Danijel Subašić", "Jordan Pickford"] },
+        { q: "Which club won the first Premier League season, in 1992-93?", c: "Manchester United", w: ["Aston Villa", "Blackburn Rovers", "Arsenal"] },
+        { q: "Which Nigerian midfielder was nicknamed \"Jay-Jay\"?", c: "Austin Okocha", w: ["Nwankwo Kanu", "Taribo West", "Finidi George"] },
+        { q: "Which country has won the most Africa Cup of Nations titles?", c: "Egypt", w: ["Cameroon", "Ghana", "Nigeria"] },
+        { q: "Which stadium hosted the 2022 World Cup final?", c: "Lusail Stadium", w: ["Al Bayt Stadium", "Khalifa International Stadium", "Education City Stadium"] },
+        { q: "Who scored a hat-trick in the 1966 World Cup final?", c: "Geoff Hurst", w: ["Bobby Charlton", "Martin Peters", "Gary Lineker"] },
+        { q: "Which club did Didier Drogba leave to join Chelsea in 2004?", c: "Marseille", w: ["Lyon", "Guingamp", "Paris Saint-Germain"] },
+        { q: "Who managed Leicester City when they won the Premier League in 2015-16?", c: "Claudio Ranieri", w: ["Brendan Rodgers", "Nigel Pearson", "Roberto Mancini"] },
+        { q: "Which country did Nigeria beat in the 2013 Africa Cup of Nations final?", c: "Burkina Faso", w: ["Ivory Coast", "Ghana", "Mali"] }
+      ]
+    },
+    general: {
+      easy: [
+        { q: "What is the capital city of Nigeria?", c: "Abuja", w: ["Lagos", "Kano", "Port Harcourt"] },
+        { q: "Which is the largest ocean on Earth?", c: "Pacific Ocean", w: ["Atlantic Ocean", "Indian Ocean", "Arctic Ocean"] },
+        { q: "How many continents are there on Earth?", c: "7", w: ["5", "6", "8"] },
+        { q: "Which planet is known as the Red Planet?", c: "Mars", w: ["Venus", "Jupiter", "Mercury"] },
+        { q: "What is the chemical formula for water?", c: "H2O", w: ["CO2", "O2", "HO"] },
+        { q: "How many days are there in a leap year?", c: "366", w: ["365", "364", "367"] },
+        { q: "Which animal is called the \"king of the jungle\"?", c: "Lion", w: ["Tiger", "Elephant", "Leopard"] },
+        { q: "How many colours are there in a rainbow?", c: "7", w: ["5", "6", "8"] },
+        { q: "Which is the fastest land animal?", c: "Cheetah", w: ["Lion", "Horse", "Leopard"] },
+        { q: "What do bees make?", c: "Honey", w: ["Milk", "Silk", "Sap"] },
+        { q: "Which is the biggest planet in our solar system?", c: "Jupiter", w: ["Saturn", "Earth", "Neptune"] },
+        { q: "How many sides does a hexagon have?", c: "6", w: ["5", "7", "8"] },
+        { q: "What is the largest mammal in the world?", c: "Blue whale", w: ["Elephant", "Giraffe", "Hippopotamus"] },
+        { q: "What is 12 multiplied by 12?", c: "144", w: ["124", "132", "148"] },
+        { q: "Which part of a plant takes in water from the soil?", c: "Roots", w: ["Leaves", "Stem", "Flowers"] },
+        { q: "Which is the longest river in Africa?", c: "The Nile", w: ["The Niger", "The Congo", "The Zambezi"] },
+        { q: "What is the capital city of Ghana?", c: "Accra", w: ["Kumasi", "Lagos", "Abuja"] },
+        { q: "What is the currency of Nigeria?", c: "Naira", w: ["Cedi", "Rand", "Shilling"] },
+        { q: "Which organ pumps blood around the body?", c: "Heart", w: ["Lungs", "Liver", "Kidney"] },
+        { q: "What is the chemical symbol for gold?", c: "Au", w: ["Ag", "Go", "Gd"] }
+      ],
+      medium: [
+        { q: "Which is the largest country in Africa by land area?", c: "Algeria", w: ["Nigeria", "Democratic Republic of the Congo", "Sudan"] },
+        { q: "Mount Kilimanjaro, the highest mountain in Africa, is in which country?", c: "Tanzania", w: ["Kenya", "Uganda", "Ethiopia"] },
+        { q: "Which Nigerian writer won the Nobel Prize in Literature in 1986?", c: "Wole Soyinka", w: ["Chinua Achebe", "Buchi Emecheta", "Cyprian Ekwensi"] },
+        { q: "What is the capital city of Australia?", c: "Canberra", w: ["Sydney", "Melbourne", "Perth"] },
+        { q: "Which gas makes up most of Earth's atmosphere?", c: "Nitrogen", w: ["Oxygen", "Carbon dioxide", "Argon"] },
+        { q: "How many bones are in the adult human body?", c: "206", w: ["212", "198", "256"] },
+        { q: "In which year was the first iPhone released?", c: "2007", w: ["2005", "2008", "2009"] },
+        { q: "Which planet is closest to the Sun?", c: "Mercury", w: ["Venus", "Mars", "Earth"] },
+        { q: "According to recent UN estimates, which country has the largest population in the world?", c: "India", w: ["China", "United States", "Indonesia"] },
+        { q: "In which year did Nigeria gain independence?", c: "1960", w: ["1957", "1963", "1966"] },
+        { q: "What is the square root of 169?", c: "13", w: ["12", "14", "17"] },
+        { q: "Which chemical element has the symbol Fe?", c: "Iron", w: ["Fluorine", "Lead", "Tin"] },
+        { q: "Which scientist discovered penicillin?", c: "Alexander Fleming", w: ["Louis Pasteur", "Marie Curie", "Joseph Lister"] },
+        { q: "Which country gave the Statue of Liberty to the United States?", c: "France", w: ["England", "Spain", "Italy"] },
+        { q: "What is the capital city of Canada?", c: "Ottawa", w: ["Toronto", "Vancouver", "Montreal"] },
+        { q: "Which is the largest hot desert in the world?", c: "Sahara", w: ["Gobi", "Kalahari", "Arabian"] },
+        { q: "Who painted the Mona Lisa?", c: "Leonardo da Vinci", w: ["Michelangelo", "Raphael", "Vincent van Gogh"] },
+        { q: "Which blood group is known as the universal red cell donor?", c: "O negative", w: ["AB positive", "A positive", "B negative"] },
+        { q: "Which city hosted the 2016 Summer Olympics?", c: "Rio de Janeiro", w: ["London", "Tokyo", "Beijing"] },
+        { q: "Which country is known as the \"Land of the Rising Sun\"?", c: "Japan", w: ["China", "Thailand", "South Korea"] }
+      ],
+      hard: [
+        { q: "What is the smallest country in the world by area?", c: "Vatican City", w: ["Monaco", "San Marino", "Liechtenstein"] },
+        { q: "Who developed the first successful polio vaccine, announced in 1955?", c: "Jonas Salk", w: ["Albert Sabin", "Louis Pasteur", "Edward Jenner"] },
+        { q: "In which year did the Berlin Wall fall?", c: "1989", w: ["1987", "1991", "1985"] },
+        { q: "Which empire was ruled by Mansa Musa?", c: "Mali Empire", w: ["Songhai Empire", "Ghana Empire", "Kanem-Bornu Empire"] },
+        { q: "Who was the first African woman to win the Nobel Peace Prize?", c: "Wangari Maathai", w: ["Ellen Johnson Sirleaf", "Leymah Gbowee", "Miriam Makeba"] },
+        { q: "Which planet currently has the most confirmed moons?", c: "Saturn", w: ["Jupiter", "Uranus", "Neptune"] },
+        { q: "Which country defeated Italy at the Battle of Adwa in 1896?", c: "Ethiopia", w: ["Egypt", "Sudan", "Libya"] },
+        { q: "What is the name of the deepest known point in Earth's oceans?", c: "Challenger Deep", w: ["Sigsbee Deep", "Tonga Trench", "Java Trench"] },
+        { q: "What is the SI unit of force?", c: "Newton", w: ["Joule", "Pascal", "Watt"] },
+        { q: "Which organ in the body produces insulin?", c: "Pancreas", w: ["Liver", "Kidney", "Spleen"] },
+        { q: "Which scientist proposed the three laws of planetary motion?", c: "Johannes Kepler", w: ["Galileo Galilei", "Nicolaus Copernicus", "Isaac Newton"] },
+        { q: "Which treaty formally ended World War I with Germany in 1919?", c: "Treaty of Versailles", w: ["Treaty of Paris", "Treaty of Rome", "Treaty of Utrecht"] },
+        { q: "Which river flows through the city of Baghdad?", c: "Tigris", w: ["Euphrates", "Nile", "Jordan"] },
+        { q: "What is the largest bone in the human body?", c: "Femur", w: ["Tibia", "Humerus", "Pelvis"] },
+        { q: "Machu Picchu, the Inca citadel, is in which country?", c: "Peru", w: ["Bolivia", "Chile", "Colombia"] },
+        { q: "Which African country was formerly known as the Gold Coast?", c: "Ghana", w: ["Ivory Coast", "Togo", "Sierra Leone"] },
+        { q: "In which year did the Titanic sink?", c: "1912", w: ["1905", "1915", "1921"] },
+        { q: "Which metal is liquid at room temperature?", c: "Mercury", w: ["Lead", "Tin", "Zinc"] },
+        { q: "Which planet in our solar system has the shortest day?", c: "Jupiter", w: ["Mars", "Earth", "Mercury"] },
+        { q: "Who discovered the electron in 1897?", c: "J.J. Thomson", w: ["Ernest Rutherford", "Niels Bohr", "James Chadwick"] }
+      ]
+    },
+    words: {
+      easy: [
+        { q: "What is the opposite of \"hot\"?", c: "Cold", w: ["Warm", "Cool", "Mild"] },
+        { q: "What is the plural of \"child\"?", c: "Children", w: ["Childs", "Childrens", "Childes"] },
+        { q: "How many letters are in the English alphabet?", c: "26", w: ["24", "25", "28"] },
+        { q: "Which word rhymes with \"cat\"?", c: "Hat", w: ["Cut", "Cot", "Cute"] },
+        { q: "Which of these is spelled correctly?", c: "Because", w: ["Becuase", "Becase", "Becouse"] },
+        { q: "Which word means the same as \"big\"?", c: "Large", w: ["Tiny", "Thin", "Short"] },
+        { q: "What is the opposite of \"ancient\"?", c: "Modern", w: ["Old", "Historic", "Antique"] },
+        { q: "What is the past tense of \"run\"?", c: "Ran", w: ["Runned", "Runs", "Running"] },
+        { q: "Which of these is spelled correctly?", c: "Friend", w: ["Freind", "Frend", "Frind"] },
+        { q: "What does the idiom \"a piece of cake\" mean?", c: "Very easy", w: ["Very tasty", "Very small", "Very expensive"] },
+        { q: "Which word means the opposite of \"happy\"?", c: "Sad", w: ["Glad", "Joyful", "Cheerful"] },
+        { q: "Which of these letters is a vowel?", c: "E", w: ["B", "K", "T"] },
+        { q: "What is the plural of \"mouse\" (the animal)?", c: "Mice", w: ["Mouses", "Mices", "Moose"] },
+        { q: "Which of these words is a verb?", c: "Jump", w: ["Quick", "Table", "Happy"] },
+        { q: "Which of these is spelled correctly?", c: "School", w: ["Scool", "Schol", "Skool"] },
+        { q: "What do we call a word with the opposite meaning?", c: "Antonym", w: ["Synonym", "Homonym", "Acronym"] },
+        { q: "Which punctuation mark ends a question?", c: "Question mark", w: ["Full stop", "Comma", "Colon"] },
+        { q: "Which word rhymes with \"night\"?", c: "Light", w: ["Late", "Lot", "Nine"] },
+        { q: "How many vowels are in the English alphabet?", c: "5", w: ["4", "6", "7"] },
+        { q: "Complete the sentence: \"I ___ a student.\"", c: "am", w: ["is", "are", "be"] }
+      ],
+      medium: [
+        { q: "Which of these is spelled correctly?", c: "Definitely", w: ["Definately", "Definitly", "Defanitely"] },
+        { q: "Which of these is spelled correctly?", c: "Accommodation", w: ["Acommodation", "Accomodation", "Accommadation"] },
+        { q: "Which word is an anagram of \"heart\"?", c: "Earth", w: ["Hearth", "Hearty", "Thread"] },
+        { q: "Which word means \"very happy\"?", c: "Elated", w: ["Gloomy", "Weary", "Frail"] },
+        { q: "Which word means the same as \"huge\"?", c: "Enormous", w: ["Tiny", "Narrow", "Gentle"] },
+        { q: "Complete the proverb: \"A stitch in time saves ___.\"", c: "Nine", w: ["Ten", "Time", "Money"] },
+        { q: "Which of these words is a palindrome, reading the same backwards?", c: "Level", w: ["Lever", "Label", "Legal"] },
+        { q: "What does the idiom \"break the ice\" mean?", c: "Make people feel more relaxed", w: ["Cause an argument", "Stop talking", "Leave early"] },
+        { q: "Which of these words starts with a silent letter?", c: "Knife", w: ["Kite", "Kettle", "Kitchen"] },
+        { q: "What is the plural of \"knife\"?", c: "Knives", w: ["Knifes", "Knifs", "Knive"] },
+        { q: "Which of these words is an adjective?", c: "Beautiful", w: ["Run", "Quickly", "Beauty"] },
+        { q: "Which of these words is an adverb?", c: "Slowly", w: ["Slow", "Slowness", "Slower"] },
+        { q: "Which of these is spelled correctly?", c: "Separate", w: ["Seperate", "Separete", "Sepparate"] },
+        { q: "What does \"procrastinate\" mean?", c: "Delay doing something", w: ["Finish early", "Forget completely", "Argue loudly"] },
+        { q: "Which word is a synonym for \"brave\"?", c: "Courageous", w: ["Timid", "Careful", "Silent"] },
+        { q: "What do we call a person who writes books?", c: "Author", w: ["Editor", "Publisher", "Critic"] },
+        { q: "Complete the proverb: \"Too many cooks spoil the ___.\"", c: "Broth", w: ["Pot", "Kitchen", "Dinner"] },
+        { q: "What do we call a word that has the same meaning as another word?", c: "Synonym", w: ["Antonym", "Acronym", "Homonym"] },
+        { q: "Which of these is spelled correctly?", c: "Receive", w: ["Recieve", "Receve", "Receeve"] },
+        { q: "What does \"rarely\" mean?", c: "Not often", w: ["Very often", "Always", "Sometimes"] }
+      ],
+      hard: [
+        { q: "Which of these is spelled correctly?", c: "Necessary", w: ["Neccessary", "Necesary", "Neccesary"] },
+        { q: "Which of these is spelled correctly?", c: "Embarrassment", w: ["Embarassment", "Embarrasment", "Embarasment"] },
+        { q: "Which of these is spelled correctly?", c: "Conscientious", w: ["Consciencious", "Conscientous", "Concientious"] },
+        { q: "Which of these is spelled correctly?", c: "Rhythm", w: ["Rythm", "Rhythem", "Rhythym"] },
+        { q: "Which of these is spelled correctly?", c: "Occurrence", w: ["Occurence", "Ocurrence", "Occurrance"] },
+        { q: "What does \"ephemeral\" mean?", c: "Lasting a very short time", w: ["Very large", "Hidden from view", "Full of energy"] },
+        { q: "What does \"benevolent\" mean?", c: "Kind and generous", w: ["Hostile", "Lazy", "Mysterious"] },
+        { q: "What does \"ubiquitous\" mean?", c: "Found everywhere", w: ["Extremely rare", "Very noisy", "Old-fashioned"] },
+        { q: "Which word means \"to make less severe\"?", c: "Mitigate", w: ["Aggravate", "Amplify", "Obscure"] },
+        { q: "Which word is a synonym of \"candid\"?", c: "Frank", w: ["Secretive", "Gentle", "Careless"] },
+        { q: "Which word is the opposite of \"verbose\"?", c: "Concise", w: ["Wordy", "Loud", "Rambling"] },
+        { q: "Which sentence uses \"their\" correctly?", c: "The players left their boots in the dressing room.", w: ["Their going to win the final.", "The trophy is over their.", "Their is a new coach today."] },
+        { q: "Which word sounds the same as \"principal\" but means a rule or belief?", c: "Principle", w: ["Principally", "Principality", "Princely"] },
+        { q: "What is the term for a word that sounds like the thing it describes, such as \"buzz\"?", c: "Onomatopoeia", w: ["Alliteration", "Metaphor", "Hyperbole"] },
+        { q: "What do we call a group of crows?", c: "A murder", w: ["A flock", "A parliament", "A pride"] },
+        { q: "What does the idiom \"bite the bullet\" mean?", c: "Endure something unpleasant bravely", w: ["Act without thinking", "Give up completely", "Argue loudly"] },
+        { q: "What does the idiom \"let the cat out of the bag\" mean?", c: "Reveal a secret", w: ["Lose something valuable", "Start a fight", "Make a mistake"] },
+        { q: "What do we call a word formed from the first letters of a phrase, such as NASA?", c: "Acronym", w: ["Acrostic", "Anagram", "Antonym"] },
+        { q: "Which word means an extreme fear of open or crowded places?", c: "Agoraphobia", w: ["Claustrophobia", "Acrophobia", "Xenophobia"] },
+        { q: "In which of these words is the letter \"b\" silent?", c: "Doubt", w: ["Table", "Number", "Rabbit"] }
+      ]
+    },
+    nigeria: {
+      easy: [
+        { q: "What is the capital city of Nigeria?", c: "Abuja", w: ["Lagos", "Kano", "Ibadan"] },
+        { q: "How many states does Nigeria have?", c: "36", w: ["30", "32", "37"] },
+        { q: "In which year did Nigeria gain independence?", c: "1960", w: ["1957", "1963", "1966"] },
+        { q: "What are the colours of the Nigerian flag?", c: "Green and white", w: ["Red and white", "Green and yellow", "Blue and white"] },
+        { q: "What is the currency of Nigeria?", c: "Naira", w: ["Cedi", "Rand", "Shilling"] },
+        { q: "What is the nickname of Nigeria's national football team?", c: "Super Eagles", w: ["Black Stars", "Indomitable Lions", "Pharaohs"] },
+        { q: "Which river gives Nigeria its name?", c: "River Niger", w: ["River Benue", "River Congo", "River Nile"] },
+        { q: "Which is the most populous city in Nigeria?", c: "Lagos", w: ["Abuja", "Kano", "Ibadan"] },
+        { q: "What is the official language of Nigeria?", c: "English", w: ["Hausa", "Yoruba", "French"] },
+        { q: "On which date is Nigeria's Independence Day celebrated?", c: "1 October", w: ["12 June", "1 January", "29 May"] },
+        { q: "Which Nigerian food is made from ground beans and steamed?", c: "Moi moi", w: ["Amala", "Eba", "Suya"] },
+        { q: "Which famous party rice dish is cooked in a tomato and pepper base?", c: "Jollof rice", w: ["Coconut rice", "White rice", "Ofada rice"] },
+        { q: "What is the capital of Rivers State?", c: "Port Harcourt", w: ["Warri", "Calabar", "Benin City"] },
+        { q: "What is the name of Nigeria's national legislature?", c: "National Assembly", w: ["Congress", "Parliament House", "Federal Council"] },
+        { q: "Which three ethnic groups are often called Nigeria's three major groups?", c: "Hausa, Igbo and Yoruba", w: ["Hausa, Fulani and Tiv", "Igbo, Ijaw and Efik", "Yoruba, Nupe and Kanuri"] },
+        { q: "Which Nigerian singer is nicknamed \"Starboy\"?", c: "Wizkid", w: ["Burna Boy", "Davido", "Rema"] },
+        { q: "What is Nigeria's film industry called?", c: "Nollywood", w: ["Bollywood", "Hollywood", "Gollywood"] },
+        { q: "Which state is nicknamed the \"Centre of Excellence\"?", c: "Lagos", w: ["Kano", "Oyo", "Rivers"] },
+        { q: "Who wrote the novel \"Things Fall Apart\"?", c: "Chinua Achebe", w: ["Wole Soyinka", "Chimamanda Ngozi Adichie", "Ben Okri"] },
+        { q: "Which bird sits at the top of Nigeria's coat of arms?", c: "Eagle", w: ["Hawk", "Parrot", "Vulture"] }
+      ],
+      medium: [
+        { q: "Who was the first President of Nigeria?", c: "Nnamdi Azikiwe", w: ["Tafawa Balewa", "Olusegun Obasanjo", "Yakubu Gowon"] },
+        { q: "In which year did Nigeria return to civilian democratic rule?", c: "1999", w: ["1993", "1998", "2003"] },
+        { q: "Which Nigerian city is known as the \"Coal City\"?", c: "Enugu", w: ["Jos", "Kaduna", "Onitsha"] },
+        { q: "Which state is called the \"Food Basket of the Nation\"?", c: "Benue", w: ["Kano", "Kogi", "Niger"] },
+        { q: "Who was Nigeria's first Prime Minister?", c: "Abubakar Tafawa Balewa", w: ["Nnamdi Azikiwe", "Obafemi Awolowo", "Ahmadu Bello"] },
+        { q: "Where is the main campus of the University of Nigeria located?", c: "Nsukka", w: ["Enugu", "Awka", "Onitsha"] },
+        { q: "Which festival in Osogbo honours a river goddess?", c: "Osun-Osogbo Festival", w: ["Argungu Festival", "Eyo Festival", "Durbar Festival"] },
+        { q: "In which state is the Argungu Fishing Festival held?", c: "Kebbi", w: ["Sokoto", "Kano", "Zamfara"] },
+        { q: "Which state is nicknamed the \"Sunshine State\"?", c: "Ondo", w: ["Osun", "Ekiti", "Ogun"] },
+        { q: "Ilorin is the capital of which state?", c: "Kwara", w: ["Kogi", "Niger", "Osun"] },
+        { q: "Which Nigerian musician is known as the pioneer of Afrobeat?", c: "Fela Kuti", w: ["King Sunny Ade", "Ebenezer Obey", "Sunny Okosun"] },
+        { q: "Which large rock on the Abuja-Kaduna road is nicknamed the \"Gateway to Abuja\"?", c: "Zuma Rock", w: ["Olumo Rock", "Idanre Hills", "Aso Rock"] },
+        { q: "Olumo Rock, a famous tourist site in Abeokuta, is in which state?", c: "Ogun", w: ["Oyo", "Osun", "Ondo"] },
+        { q: "Which Nigerian athlete won gold in the long jump at the 1996 Olympics?", c: "Chioma Ajunwa", w: ["Mary Onyali", "Blessing Okagbare", "Falilat Ogunkoya"] },
+        { q: "Which Nigerian artist released the 2019 album \"African Giant\"?", c: "Burna Boy", w: ["Wizkid", "Davido", "Rema"] },
+        { q: "Which Nigerian author wrote \"Purple Hibiscus\"?", c: "Chimamanda Ngozi Adichie", w: ["Chinua Achebe", "Buchi Emecheta", "Helon Habila"] },
+        { q: "Which state is nicknamed the \"Gateway State\"?", c: "Ogun", w: ["Lagos", "Edo", "Delta"] },
+        { q: "In which year did Nigeria become a republic?", c: "1963", w: ["1960", "1966", "1979"] },
+        { q: "Which city was the capital of the former Eastern Region?", c: "Enugu", w: ["Calabar", "Aba", "Owerri"] },
+        { q: "Which city was the capital of the former Northern Region?", c: "Kaduna", w: ["Kano", "Sokoto", "Jos"] }
+      ],
+      hard: [
+        { q: "In which year did Abuja officially replace Lagos as Nigeria's capital?", c: "1991", w: ["1976", "1985", "1999"] },
+        { q: "In which year did the Nigerian Civil War end?", c: "1970", w: ["1967", "1966", "1975"] },
+        { q: "What is the highest point in Nigeria?", c: "Chappal Waddi", w: ["Zuma Rock", "Olumo Rock", "Mambilla Plateau"] },
+        { q: "Who wrote the novel \"Half of a Yellow Sun\"?", c: "Chimamanda Ngozi Adichie", w: ["Chinua Achebe", "Ben Okri", "Helon Habila"] },
+        { q: "Which Head of State created Nigeria's first 12 states in 1967?", c: "Yakubu Gowon", w: ["Murtala Mohammed", "Ibrahim Babangida", "Sani Abacha"] },
+        { q: "Which of these states was created in 1996?", c: "Ekiti", w: ["Osun", "Ondo", "Kwara"] },
+        { q: "Which Head of State was killed in a failed coup in February 1976?", c: "Murtala Mohammed", w: ["Aguiyi-Ironsi", "Tafawa Balewa", "Sani Abacha"] },
+        { q: "Which Nigerian kingdom was famous for its bronze plaques?", c: "Benin Kingdom", w: ["Oyo Empire", "Kanem-Bornu", "Nri Kingdom"] },
+        { q: "Which ancient Nigerian civilisation produced terracotta sculptures from around 500 BC?", c: "Nok", w: ["Igbo-Ukwu", "Ife", "Benin"] },
+        { q: "Which caliphate was founded after Usman dan Fodio's jihad of 1804?", c: "Sokoto Caliphate", w: ["Oyo Empire", "Bornu Empire", "Benin Empire"] },
+        { q: "Who led the secessionist Republic of Biafra?", c: "Chukwuemeka Odumegwu Ojukwu", w: ["Nnamdi Azikiwe", "Philip Effiong", "Emeka Anyaoku"] },
+        { q: "In which year was the June 12 presidential election annulled?", c: "1993", w: ["1991", "1995", "1999"] },
+        { q: "Who is widely regarded as the winner of the annulled June 12, 1993 election?", c: "M.K.O. Abiola", w: ["Bashir Tofa", "Olusegun Obasanjo", "Bola Tinubu"] },
+        { q: "Who was the first Premier of the Western Region?", c: "Obafemi Awolowo", w: ["Samuel Akintola", "Ahmadu Bello", "Michael Okpara"] },
+        { q: "In which year were Nigeria's Northern and Southern Protectorates amalgamated?", c: "1914", w: ["1900", "1906", "1922"] },
+        { q: "Which British journalist is credited with coining the name \"Nigeria\"?", c: "Flora Shaw", w: ["Mary Slessor", "Margery Perham", "Elspeth Huxley"] },
+        { q: "Which Nigerian author wrote \"The Joys of Motherhood\"?", c: "Buchi Emecheta", w: ["Flora Nwapa", "Ama Ata Aidoo", "Mariama Bâ"] },
+        { q: "Which is the largest Nigerian state by land area?", c: "Niger State", w: ["Borno", "Taraba", "Kwara"] },
+        { q: "In 2021, Ngozi Okonjo-Iweala became the first woman and first African to lead which organisation?", c: "World Trade Organization", w: ["International Monetary Fund", "World Bank", "United Nations"] },
+        { q: "Which Nigerian author won the 1991 Booker Prize for \"The Famished Road\"?", c: "Ben Okri", w: ["Wole Soyinka", "Chinua Achebe", "Helon Habila"] }
+      ]
+    },
+    science: {
+      easy: [
+        { q: "Which gas do humans need to breathe in to live?", c: "Oxygen", w: ["Nitrogen", "Carbon dioxide", "Hydrogen"] },
+        { q: "What is the closest star to Earth?", c: "The Sun", w: ["Polaris", "Sirius", "Proxima Centauri"] },
+        { q: "How many planets are there in our solar system?", c: "8", w: ["7", "9", "10"] },
+        { q: "Which force pulls objects towards the Earth?", c: "Gravity", w: ["Magnetism", "Friction", "Static electricity"] },
+        { q: "Which gas do plants take in from the air to make food?", c: "Carbon dioxide", w: ["Oxygen", "Nitrogen", "Helium"] },
+        { q: "Which of these is the hardest natural substance?", c: "Diamond", w: ["Gold", "Iron", "Quartz"] },
+        { q: "At sea level, water boils at how many degrees Celsius?", c: "100", w: ["90", "80", "120"] },
+        { q: "Which planet is famous for its rings?", c: "Saturn", w: ["Mars", "Venus", "Mercury"] },
+        { q: "What does a thermometer measure?", c: "Temperature", w: ["Weight", "Speed", "Pressure"] },
+        { q: "Which organs do we use to breathe?", c: "Lungs", w: ["Heart", "Liver", "Stomach"] },
+        { q: "What is Earth's main source of light and heat?", c: "The Sun", w: ["The Moon", "Wind", "Volcanoes"] },
+        { q: "What do we call animals that eat only plants?", c: "Herbivores", w: ["Carnivores", "Omnivores", "Insectivores"] },
+        { q: "What does \"CPU\" stand for in a computer?", c: "Central Processing Unit", w: ["Central Program Utility", "Computer Personal Unit", "Core Processing Update"] },
+        { q: "Water freezes at how many degrees Celsius?", c: "0", w: ["10", "-10", "32"] },
+        { q: "Which instrument is used to see very tiny things like cells?", c: "Microscope", w: ["Telescope", "Periscope", "Stethoscope"] },
+        { q: "What is the largest organ of the human body?", c: "Skin", w: ["Liver", "Heart", "Brain"] },
+        { q: "How many legs does an insect have?", c: "6", w: ["4", "8", "10"] },
+        { q: "What is the name of the galaxy our solar system is in?", c: "Milky Way", w: ["Andromeda", "Whirlpool", "Sombrero"] },
+        { q: "Which instrument is used to look at distant stars?", c: "Telescope", w: ["Microscope", "Stethoscope", "Compass"] },
+        { q: "What does \"USB\" stand for?", c: "Universal Serial Bus", w: ["Universal Switch Board", "United Serial Box", "Unified System Bus"] }
+      ],
+      medium: [
+        { q: "What is the chemical symbol for sodium?", c: "Na", w: ["So", "Sd", "S"] },
+        { q: "Which part of the cell is known as its powerhouse?", c: "Mitochondria", w: ["Nucleus", "Ribosome", "Chloroplast"] },
+        { q: "Which planet is known for its Great Red Spot?", c: "Jupiter", w: ["Mars", "Saturn", "Neptune"] },
+        { q: "How many chromosomes do humans normally have in each body cell?", c: "46", w: ["23", "44", "48"] },
+        { q: "About how fast does light travel?", c: "300,000 km per second", w: ["150,000 km per second", "30,000 km per second", "3,000,000 km per second"] },
+        { q: "Who proposed the theory of general relativity?", c: "Albert Einstein", w: ["Isaac Newton", "Niels Bohr", "Stephen Hawking"] },
+        { q: "Which vitamin does the skin make when exposed to sunlight?", c: "Vitamin D", w: ["Vitamin C", "Vitamin A", "Vitamin B12"] },
+        { q: "What is the pH of pure water?", c: "7", w: ["0", "5", "14"] },
+        { q: "What does \"HTML\" stand for?", c: "HyperText Markup Language", w: ["HighText Machine Language", "Hyperlink and Text Markup Language", "Home Tool Markup Language"] },
+        { q: "Who is often called the \"father of the computer\" for designing the Analytical Engine?", c: "Charles Babbage", w: ["Alan Turing", "Bill Gates", "Tim Berners-Lee"] },
+        { q: "Which blood cells help the body fight infection?", c: "White blood cells", w: ["Red blood cells", "Platelets", "Plasma"] },
+        { q: "What is the chemical name of the acid with formula H2SO4?", c: "Sulfuric acid", w: ["Hydrochloric acid", "Nitric acid", "Acetic acid"] },
+        { q: "What is the unit of electrical resistance?", c: "Ohm", w: ["Volt", "Ampere", "Watt"] },
+        { q: "Which planet is often called the Morning Star or Evening Star?", c: "Venus", w: ["Mercury", "Mars", "Jupiter"] },
+        { q: "What kind of energy is stored in a stretched spring?", c: "Potential energy", w: ["Kinetic energy", "Thermal energy", "Sound energy"] },
+        { q: "Which scientist is famous for the laws of motion and universal gravitation?", c: "Isaac Newton", w: ["Galileo Galilei", "Albert Einstein", "Michael Faraday"] },
+        { q: "What is the process by which plants make food using sunlight?", c: "Photosynthesis", w: ["Respiration", "Digestion", "Fermentation"] },
+        { q: "What does \"AI\" stand for in technology?", c: "Artificial Intelligence", w: ["Automated Internet", "Advanced Input", "Applied Integration"] },
+        { q: "Which part of the cell contains most of its DNA?", c: "Nucleus", w: ["Membrane", "Cytoplasm", "Vacuole"] },
+        { q: "Which element has the atomic number 1?", c: "Hydrogen", w: ["Helium", "Oxygen", "Lithium"] }
+      ],
+      hard: [
+        { q: "Which element has the atomic number 6?", c: "Carbon", w: ["Nitrogen", "Oxygen", "Boron"] },
+        { q: "Who is credited with inventing the World Wide Web in 1989?", c: "Tim Berners-Lee", w: ["Vint Cerf", "Bill Gates", "Steve Jobs"] },
+        { q: "Which gas is the most abundant in the Sun?", c: "Hydrogen", w: ["Helium", "Oxygen", "Carbon"] },
+        { q: "Which subatomic particle has no electric charge?", c: "Neutron", w: ["Proton", "Electron", "Positron"] },
+        { q: "What was the name of the first artificial satellite, launched in 1957?", c: "Sputnik 1", w: ["Explorer 1", "Vostok 1", "Apollo 1"] },
+        { q: "Who became the first human in space, in 1961?", c: "Yuri Gagarin", w: ["Alan Shepard", "Neil Armstrong", "John Glenn"] },
+        { q: "About how old is the Earth?", c: "4.5 billion years", w: ["450 million years", "2 billion years", "10 billion years"] },
+        { q: "Which scientist published the first widely recognised periodic table in 1869?", c: "Dmitri Mendeleev", w: ["Antoine Lavoisier", "John Dalton", "Niels Bohr"] },
+        { q: "What is the chemical symbol for tungsten?", c: "W", w: ["Tu", "T", "Tn"] },
+        { q: "Which part of the brain mainly controls balance and coordination?", c: "Cerebellum", w: ["Cerebrum", "Medulla", "Hippocampus"] },
+        { q: "Which law says that every action has an equal and opposite reaction?", c: "Newton's third law", w: ["Newton's first law", "Newton's second law", "Boyle's law"] },
+        { q: "How many bits are there in one byte?", c: "8", w: ["4", "16", "10"] },
+        { q: "What does \"GPS\" stand for?", c: "Global Positioning System", w: ["Global Position Signal", "General Positioning Satellite", "Ground Path System"] },
+        { q: "Which planet in our solar system has the longest year?", c: "Neptune", w: ["Uranus", "Saturn", "Jupiter"] },
+        { q: "What is the SI unit of electric current?", c: "Ampere", w: ["Volt", "Ohm", "Coulomb"] },
+        { q: "A lack of which vitamin causes scurvy?", c: "Vitamin C", w: ["Vitamin A", "Vitamin D", "Vitamin K"] },
+        { q: "What is the type of cell division that produces gametes (sex cells)?", c: "Meiosis", w: ["Mitosis", "Osmosis", "Diffusion"] },
+        { q: "Which scientist discovered radioactivity in uranium in 1896?", c: "Henri Becquerel", w: ["Marie Curie", "Ernest Rutherford", "Wilhelm Röntgen"] },
+        { q: "What is the chemical symbol for potassium?", c: "K", w: ["P", "Po", "Pt"] },
+        { q: "Which type of blood vessel carries blood away from the heart?", c: "Artery", w: ["Vein", "Capillary", "Venule"] }
+      ]
+    }
   };
-  var CAT_LABEL = { football: "Football", general: "General knowledge", words: "Word play" };
-  var TOPIC_LABEL = { mixed: "Mixed", football: "Football", general: "General knowledge", words: "Word play" };
+  var CAT_LABEL = { football: "Football", general: "General knowledge", words: "Word play", nigeria: "Nigeria", science: "Science and tech" };
+  var TOPIC_LABEL = { mixed: "Mixed", football: "Football", general: "General knowledge", words: "Word play", nigeria: "Nigeria", science: "Science and tech" };
+  var LEVEL_LABEL = { easy: "Easy", medium: "Medium", hard: "Hard" };
 
   function $(s) { return document.querySelector(s); }
   function shuffle(a) {
@@ -453,10 +762,12 @@
     p.on("open", function () {
       H = {
         players: [{ id: "host", name: myName, conn: null, score: 0, right: 0, streak: 0, done: false, choice: null, t: 0, delta: 0, ok: false }],
-        topic: "mixed", started: false, deck: [], i: 0, ci: 0, qStart: 0, revealed: false, tOut: null, next: null
+        topic: "mixed", level: "medium", started: false, deck: [], i: 0, ci: 0, qStart: 0, revealed: false, tOut: null, next: null
       };
       var radios = document.querySelectorAll('input[name="tcat"]');
       Array.prototype.forEach.call(radios, function (r) { r.checked = r.value === "mixed"; });
+      var lradios = document.querySelectorAll('input[name="tlvl"]');
+      Array.prototype.forEach.call(lradios, function (r) { r.checked = r.value === "medium"; });
       broadcastLobby();
     });
     p.on("connection", onGuestConn);
@@ -515,7 +826,7 @@
   function broadcast(m) { if (H) H.players.forEach(function (p) { if (p.conn) send(p.conn, m); }); }
 
   function broadcastLobby() {
-    var m = { t: "lobby", players: H.players.map(function (p, i) { return { name: p.name, host: i === 0 }; }), topic: H.topic, code: code };
+    var m = { t: "lobby", players: H.players.map(function (p, i) { return { name: p.name, host: i === 0 }; }), topic: H.topic, level: H.level, code: code };
     broadcast(m);
     renderLobby(m);
   }
@@ -524,7 +835,7 @@
     if (!H || H.started || H.players.length < 2) return;
     var pool = [];
     Object.keys(BANK).forEach(function (k) {
-      if (H.topic === "mixed" || H.topic === k) BANK[k].forEach(function (q) { pool.push({ q: q.q, c: q.c, w: q.w, cat: k }); });
+      if (H.topic === "mixed" || H.topic === k) BANK[k][H.level || "medium"].forEach(function (q) { pool.push({ q: q.q, c: q.c, w: q.w, cat: k }); });
     });
     H.deck = shuffle(pool).slice(0, ROUND);
     H.started = true;
@@ -674,8 +985,9 @@
       ul.appendChild(li);
     });
     $("#topicChips").hidden = !host;
+    $("#levelChips").hidden = !host;
     $("#topicText").hidden = host;
-    $("#topicText").textContent = "Topic: " + (TOPIC_LABEL[m.topic] || "Mixed");
+    $("#topicText").textContent = "Topic: " + (TOPIC_LABEL[m.topic] || "Mixed") + "  |  Level: " + (LEVEL_LABEL[m.level] || "Medium");
     $("#startBtn").hidden = !host;
     $("#startBtn").disabled = m.players.length < 2;
     setLobbyNote(host ? (m.players.length < 2 ? "Waiting for at least one friend to join." : "Ready when you are.") : "Waiting for the host to start.");
@@ -831,6 +1143,12 @@
   Array.prototype.forEach.call(document.querySelectorAll('input[name="tcat"]'), function (r) {
     r.addEventListener("change", function () {
       if (role === "host" && H && !H.started) { H.topic = r.value; broadcastLobby(); }
+    });
+  });
+
+  Array.prototype.forEach.call(document.querySelectorAll('input[name="tlvl"]'), function (r) {
+    r.addEventListener("change", function () {
+      if (role === "host" && H && !H.started) { H.level = r.value; broadcastLobby(); }
     });
   });
 
